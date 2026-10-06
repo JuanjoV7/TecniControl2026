@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="utf-8">
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+        <title>@ViewData["Title"] - TecniControl</title>
+        <meta content="" name="description">
+        <meta content="" name="keywords">
+
+        @await Html.PartialAsync("_Styles")
+
+        @await RenderSectionAsync("Styles", required: false)
+
+      <!-- =======================================================
+      * Template Name: NiceAdmin
+      * Template URL: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/
+      * Updated: Mar 17 2024 with Bootstrap v5.3.3
+      * Author: BootstrapMade.com
+      * License: https://bootstrapmade.com/license/
+      ======================================================== -->
+    </head>
+
+    <body>
+
+        @await Html.PartialAsync("_Header")
+
+        @await Html.PartialAsync("_Sidebar")
+
+        <main id="main" class="main">
+
+            @RenderBody()
+
+        </main>
+
+        @await Html.PartialAsync("_Footer")
+
+        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+        @await Html.PartialAsync("_Scripts")
+
+        @await RenderSectionAsync("Scripts", required: false)
+
+    </body>
+
+</html>
