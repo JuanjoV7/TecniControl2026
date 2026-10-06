@@ -1,0 +1,250 @@
+@model PaginationResponse<ClienteDTO>
+
+@{
+    ViewData["Title"] = "Clientes";
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div class="row">
+
+                <h3 class="m-0 font-weight-bold text-primary col-md-11">@ViewData["Title"]</h3>
+
+                <div class="col-md-1">
+                    <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle"></i></a>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-body mt-3">
+
+            <form asp-action="Index" class="navbar-search" method="GET">
+
+                <input type="hidden" name="Page" value="1" />
+
+                <div class="row mt-3">
+
+                    <div class="col-md-auto">
+                        <select asp-for="RecordsPerPage" class="form-select bg-light border-0 small">
+                            <option value="10" selected="@(Model.RecordsPerPage == 10)">10</option>
+                            <option value="15" selected="@(Model.RecordsPerPage == 15)">15</option>
+                            <option value="30" selected="@(Model.RecordsPerPage == 30)">30</option>
+                            <option value="50" selected="@(Model.RecordsPerPage == 50)">50</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-10">
+                        <div class="input-group mb-3">
+                            <input type="text"
+                                   class="form-control bg-light border-0 small"
+                                   placeholder="Buscar por nombre, documento, teléfono o correo..."
+                                   aria-label="search"
+                                   asp-for="Filter" />
+
+                            <button class="btn btn-primary"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+
+            <table class="table table-bordered">
+
+                <thead>
+                    <tr>
+                        <th>Documento</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Estado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @if (!Model.List.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No se encontraron clientes.</td>
+                        </tr>
+                    }
+
+                    @foreach (ClienteDTO item in Model.List)
+                    {
+                        string rowClass = item.Activo ? "" : "table-secondary";
+
+                        <tr class="@rowClass">
+                            <td>@item.Documento</td>
+                            <td>@item.Nombre</td>
+                            <td>@item.Telefono</td>
+                            <td>@item.Email</td>
+                            <td>
+                                @if (item.Activo)
+                                {
+                                    <span class="badge bg-success">Activo</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactivo</span>
+                                }
+                            </td>
+                            <td>
+                                <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+
+                                @if (item.Activo)
+                                {
+                                    <form asp-action="Toggle" method="POST" style="display: contents;">
+                                        <input type="hidden" name="ClienteId" value="@item.Id" />
+                                        <input type="hidden" name="Activo" value="false" />
+
+                                        <button class="btn btn-sm btn-danger btnDeactivate"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-original-title="Desactivar"
+                                                data-nombre="@item.Nombre">
+                                            <i class="bi bi-person-x-fill"></i>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <form asp-action="Toggle" method="POST" style="display: contents;">
+                                        <input type="hidden" name="ClienteId" value="@item.Id" />
+                                        <input type="hidden" name="Activo" value="true" />
+
+                                        <button class="btn btn-sm btn-success"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-original-title="Activar">
+                                            <i class="bi bi-person-check-fill"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+            <nav aria-label="">
+                <ul class="pagination justify-content-center">
+
+                    @* First *@
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-route-Page="1"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage"
+                           asp-route-Filter="@Model.Filter"
+                           asp-action="Index">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+
+                    @* Previous *@
+                    <li class="page-item @(!Model.HasPrevious ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-route-Page="@(Model.CurrentPage - 1)"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage"
+                           asp-route-Filter="@Model.Filter"
+                           asp-action="Index">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    @* Pages *@
+                    @foreach (int page in Model.Pages)
+                    {
+                        <li class="page-item @(Model.CurrentPage == page ? "active" : "")">
+                            <a class="page-link"
+                               asp-route-Page="@(page)"
+                               asp-route-RecordsPerPage="@Model.RecordsPerPage"
+                               asp-route-Filter="@Model.Filter"
+                               asp-action="Index">
+                                @(page)
+                            </a>
+                        </li>
+                    }
+
+                    @* Next *@
+                    <li class="page-item @(!Model.HasNext ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-route-Page="@(Model.CurrentPage + 1)"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage"
+                           asp-route-Filter="@Model.Filter"
+                           asp-action="Index">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    @* Last *@
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link"
+                           asp-route-Page="@Model.TotalPages"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage"
+                           asp-route-Filter="@Model.Filter"
+                           asp-action="Index">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function() {
+
+            $('.btnDeactivate').click(function(event) {
+
+                event.preventDefault();
+
+                const nombre = $(this).data('nombre');
+
+                Swal.fire({
+                    icon: 'question',
+                    title: '¿Desea desactivar al cliente?',
+                    text: nombre,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, desactivar',
+                    cancelButtonText: 'Cancelar'
+
+                }).then((result) => {
+
+                    if (result.isConfirmed) {
+
+                        const form = $(this).closest('form');
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+    </script>
+
+}

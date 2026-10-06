@@ -1,4 +1,4 @@
-namespace TecniControl2026.web.Models
+namespace TecniControl2026.Web.Models
 {
     public class ErrorViewModel
     {

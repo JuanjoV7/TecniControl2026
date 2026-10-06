@@ -1,17 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using TecniControl2026.web.Models;
+using TecniControl2026.Web.Models;
 
-namespace TecniControl2026.web.Controllers
+namespace TecniControl2026.Web.Controllers
 {
     public class HomeController : Controller
     {
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }

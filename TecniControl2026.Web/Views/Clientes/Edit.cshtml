@@ -1,0 +1,84 @@
+@model UpdateClienteDTO
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Clientes</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section dashboard">
+
+    <div class="card">
+
+        <div class="card-header">
+            <div class="row">
+                <h3 class="m-0 font-weight-bold text-primary col-md-11">@ViewData["Title"]</h3>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="POST" class="row g-3 mt-2">
+
+                <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="Activo" />
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Documento" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Documento)" />
+                        <label asp-for="Documento"></label>
+                        <span asp-validation-for="Documento" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Nombre" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Nombre)" />
+                        <label asp-for="Nombre"></label>
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Telefono" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Telefono)" />
+                        <label asp-for="Telefono"></label>
+                        <span asp-validation-for="Telefono" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Email" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Email)" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button class="btn btn-primary" type="submit">Guardar</button>
+                    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</section>
+
+@section Scripts {
+
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
