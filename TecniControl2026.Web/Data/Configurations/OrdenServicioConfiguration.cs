@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TecniControl2026.Web.Data.Entities;
 
@@ -13,8 +12,7 @@ namespace TecniControl2026.Web.Data.Configurations
 
             // Consecutivo autoincremental; nunca se envía en un UPDATE
             builder.Property(o => o.Numero)
-                   .UseIdentityColumn()
-                   .Metadata.SetAfterSaveBehavior(PropertySaveBehavior.Ignore);
+                   .UseIdentityColumn();
 
             builder.HasIndex(o => o.Numero).IsUnique();
 
