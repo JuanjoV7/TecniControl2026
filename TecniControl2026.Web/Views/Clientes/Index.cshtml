@@ -117,6 +117,7 @@
             <nav aria-label="Paginación de clientes">
                 <ul class="pagination justify-content-center">
 
+                    @* Primera *@
                     <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-Page="1"
                            asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
@@ -124,6 +125,7 @@
                         </a>
                     </li>
 
+                    @* Anterior *@
                     <li class="page-item @(!Model.HasPrevious ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-Page="@(Model.CurrentPage - 1)"
                            asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
@@ -131,16 +133,18 @@
                         </a>
                     </li>
 
-                    @foreach (int page in Model.Pages)
+                    @* Páginas *@
+                    @foreach (int pageNumber in Model.Pages)
                     {
-                        <li class="page-item @(Model.CurrentPage == page ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-Page="@page"
+                        <li class="page-item @(Model.CurrentPage == pageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-Page="@(pageNumber)"
                                asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
-                                @page
+                                @(pageNumber)
                             </a>
                         </li>
                     }
 
+                    @* Siguiente *@
                     <li class="page-item @(!Model.HasNext ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-Page="@(Model.CurrentPage + 1)"
                            asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
@@ -148,6 +152,7 @@
                         </a>
                     </li>
 
+                    @* Última *@
                     <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
                         <a class="page-link" asp-action="Index" asp-route-Page="@Model.TotalPages"
                            asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
@@ -183,6 +188,10 @@
                 if (result.isConfirmed) {
                     form.trigger('submit');
                 }
+            });
+        });
+    </script>
+}
             });
         });
     </script>
