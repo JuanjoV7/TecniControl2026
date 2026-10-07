@@ -8,6 +8,7 @@ namespace TecniControl2026.Web.Services.Abstractions
     {
         public Task<Response<CreateClienteDTO>> CreateAsync(CreateClienteDTO dto);
         public Task<Response<ClienteDTO>> GetOneAsync(Guid id);
+        public Task<Response<List<ClienteDTO>>> GetActiveAsync();
         public Task<Response<PaginationResponse<ClienteDTO>>> GetPaginationAsync(PaginationRequest request);
         public Task<Response<ClienteDTO>> UpdateAsync(UpdateClienteDTO dto);
         public Task<Response<object>> ToggleAsync(ToggleClienteStatusDTO dto);

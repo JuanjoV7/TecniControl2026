@@ -21,5 +21,7 @@ namespace TecniControl2026.Web.Data.Entities
         public string? Email { get; set; }
 
         public bool Activo { get; set; } = true;
+
+        public ICollection<Equipo> Equipos { get; set; } = new List<Equipo>();
     }
 }
