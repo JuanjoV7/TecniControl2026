@@ -7,6 +7,7 @@ namespace TecniControl2026.Web.Services.Abstractions
     public interface IEquiposService
     {
         public Task<Response<CreateEquipoDTO>> CreateAsync(CreateEquipoDTO dto);
+        public Task<Response<object>> DeleteAsync(Guid id);
         public Task<Response<EquipoDTO>> GetOneAsync(Guid id);
         public Task<Response<PaginationResponse<EquipoDTO>>> GetPaginationAsync(PaginationRequest request);
         public Task<Response<List<EquipoDTO>>> GetByClienteAsync(Guid clienteId);

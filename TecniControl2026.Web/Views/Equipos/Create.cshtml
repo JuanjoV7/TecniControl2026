@@ -1,0 +1,31 @@
+@model CreateEquipoDTO
+
+@{
+    ViewData["Title"] = "Nuevo Equipo";
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li><li class="breadcrumb-item"><a asp-action="Index">Equipos</a></li><li class="breadcrumb-item active">@ViewData["Title"]</li></ol></nav>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Datos del equipo</h5>
+            <form asp-action="Create" method="post" class="row g-3">
+                <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+                <div class="col-md-6"><div class="form-floating"><select asp-for="ClienteId" asp-items="ViewBag.Clientes" class="form-select"><option value="">Seleccione un cliente</option></select><label asp-for="ClienteId"></label><span asp-validation-for="ClienteId" class="text-danger"></span></div></div>
+                <div class="col-md-6"><div class="form-floating"><select asp-for="Tipo" asp-items="Html.GetEnumSelectList<TipoEquipo>()" class="form-select"></select><label asp-for="Tipo"></label><span asp-validation-for="Tipo" class="text-danger"></span></div></div>
+                <div class="col-md-6"><div class="form-floating"><input asp-for="Marca" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Marca)" /><label asp-for="Marca"></label><span asp-validation-for="Marca" class="text-danger"></span></div></div>
+                <div class="col-md-6"><div class="form-floating"><input asp-for="Modelo" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Modelo)" /><label asp-for="Modelo"></label><span asp-validation-for="Modelo" class="text-danger"></span></div></div>
+                <div class="col-md-6"><div class="form-floating"><input asp-for="Serial" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Serial)" /><label asp-for="Serial"></label><span asp-validation-for="Serial" class="text-danger"></span></div></div>
+                <div class="col-12 text-center mt-3"><button class="btn btn-primary" type="submit"><i class="bi bi-save"></i> Guardar</button> <a asp-action="Index" class="btn btn-secondary">Cancelar</a></div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

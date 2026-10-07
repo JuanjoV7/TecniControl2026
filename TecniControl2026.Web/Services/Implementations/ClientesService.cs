@@ -44,6 +44,23 @@ namespace TecniControl2026.Web.Services.Implementations
             return await GetOneAsync<ClienteDTO, Cliente>(id);
         }
 
+        public async Task<Response<List<ClienteDTO>>> GetActiveAsync()
+        {
+            try
+            {
+                List<Cliente> clientes = await _context.Clientes.AsNoTracking()
+                                                               .Where(c => c.Activo)
+                                                               .OrderBy(c => c.Nombre)
+                                                               .ToListAsync();
+
+                return Response<List<ClienteDTO>>.Success(_mapper.Map<List<ClienteDTO>>(clientes));
+            }
+            catch (Exception ex)
+            {
+                return Response<List<ClienteDTO>>.Failure(ex);
+            }
+        }
+
         public async Task<Response<PaginationResponse<ClienteDTO>>> GetPaginationAsync(PaginationRequest request)
         {
             IQueryable<Cliente> query = _context.Clientes.AsQueryable();
