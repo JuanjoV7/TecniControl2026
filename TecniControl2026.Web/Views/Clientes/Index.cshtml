@@ -29,7 +29,7 @@
                 <input type="hidden" name="Page" value="1" />
 
                 <div class="col-auto">
-                    <select asp-for="RecordsPerPage" class="form-select">
+                    <select asp-for="RecordsPerPage" class="form-select" onchange="this.form.submit()">
                         <option value="10" selected="@(Model.RecordsPerPage == 10)">10</option>
                         <option value="15" selected="@(Model.RecordsPerPage == 15)">15</option>
                         <option value="30" selected="@(Model.RecordsPerPage == 30)">30</option>
