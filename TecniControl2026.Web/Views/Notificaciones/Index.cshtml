@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Historial de Notificaciones";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Módulo de Notificaciones y Tracking</h2>
+        <span class="badge bg-primary">TecniControl System</span>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Bitácora de Salida de Notificaciones</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">
+                Listado de eventos enviados por canal (Email / Sistema Interno) procesados mediante polimorfismo de clases.
+            </p>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped border">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Detalle de la Actuación / Evento</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Registros != null)
+                        {
+                            int contador = 1;
+                            @foreach (string registro in ViewBag.Registros)
+                            {
+                                <tr>
+                                    <td><strong>@contador</strong></td>
+                                    <td><code>@registro</code></td>
+                                    <td><span class="badge bg-success">Procesado</span></td>
+                                </tr>
+                                contador++;
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
