@@ -41,6 +41,30 @@ namespace TecniControl2026.Web.Services.Implementations
             return response;
         }
 
+        public async Task<Response<object>> DeleteAsync(Guid id)
+        {
+            if (!await _context.Equipos.AnyAsync(e => e.Id == id))
+            {
+                return Response<object>.Failure($"No existe equipo con id {id}");
+            }
+
+            bool tieneOrdenes = await _context.OrdenesServicio.AnyAsync(o => o.EquipoId == id);
+
+            if (tieneOrdenes)
+            {
+                return Response<object>.Failure("No se puede eliminar el equipo porque tiene órdenes de servicio asociadas");
+            }
+
+            Response<object> response = await DeleteAsync<Equipo>(id);
+
+            if (response.IsSuccess)
+            {
+                response.Message = "Equipo eliminado con éxito";
+            }
+
+            return response;
+        }
+
         public async Task<Response<EquipoDTO>> GetOneAsync(Guid id)
         {
             return await GetOneAsync<EquipoDTO, Equipo>(id, _context.Equipos.Include(e => e.Cliente));
