@@ -1,7 +1,12 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 @model PaginationResponse<EquipoDTO>
 
 @{
     ViewData["Title"] = "Equipos";
+    bool puedeCrear = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Equipos.Crear)).Succeeded;
+    bool puedeEditar = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Equipos.Editar)).Succeeded;
+    bool puedeEliminar = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Equipos.Eliminar)).Succeeded;
 }
 
 <div class="pagetitle">
@@ -14,7 +19,7 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="card-title">Listado de equipos</h5>
-                <a asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Nuevo equipo</a>
+                @if (puedeCrear) { <a asp-action="Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle"></i> Nuevo equipo</a> }
             </div>
 
             <form asp-action="Index" method="get" class="row g-2 mb-3">
@@ -55,14 +60,14 @@
                                 <td>@item.Modelo</td>
                                 <td>@(string.IsNullOrWhiteSpace(item.Serial) ? "Sin serial" : item.Serial)</td>
                                 <td class="text-end">
-                                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar"><i class="bi bi-pencil-fill"></i></a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
+                                    @if (puedeEditar) { <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar"><i class="bi bi-pencil-fill"></i></a> }
+                                    @if (puedeEliminar) { <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
                                         <button type="submit" class="btn btn-sm btn-danger btnDelete"
                                                 data-equipo="@item.Descripcion"
                                                 data-bs-toggle="tooltip" data-bs-title="Eliminar">
                                             <i class="bi bi-trash-fill"></i>
                                         </button>
-                                    </form>
+                                    </form> }
                                 </td>
                             </tr>
                         }

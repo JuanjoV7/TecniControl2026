@@ -2,6 +2,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TecniControl2026.Web.Core;
+using TecniControl2026.Web.Core.Authorization;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.DTOs.Cliente;
 using TecniControl2026.Web.DTOs.Equipo;
@@ -26,6 +27,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [TienePermiso(PermisosCatalogo.Equipos.Ver)]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<EquipoDTO>> response = await _equiposService.GetPaginationAsync(request);
@@ -40,6 +42,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [TienePermiso(PermisosCatalogo.Equipos.Crear)]
         public async Task<IActionResult> Create()
         {
             if (!await LoadClientesAsync())
@@ -50,7 +53,8 @@ namespace TecniControl2026.Web.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [TienePermiso(PermisosCatalogo.Equipos.Crear)]
         public async Task<IActionResult> Create([FromForm] CreateEquipoDTO dto)
         {
             if (!ModelState.IsValid)
@@ -74,6 +78,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [TienePermiso(PermisosCatalogo.Equipos.Editar)]
         public async Task<IActionResult> Edit([FromRoute] Guid id)
         {
             Response<EquipoDTO> response = await _equiposService.GetOneAsync(id);
@@ -102,7 +107,8 @@ namespace TecniControl2026.Web.Controllers
             return View(dto);
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [TienePermiso(PermisosCatalogo.Equipos.Editar)]
         public async Task<IActionResult> Edit([FromForm] UpdateEquipoDTO dto)
         {
             if (!ModelState.IsValid)
@@ -125,7 +131,8 @@ namespace TecniControl2026.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [TienePermiso(PermisosCatalogo.Equipos.Eliminar)]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             Response<object> response = await _equiposService.DeleteAsync(id);

@@ -1,7 +1,11 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 @model PaginationResponse<ClienteDTO>
 
 @{
     ViewData["Title"] = "Clientes";
+    bool puedeCrear = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Clientes.Crear)).Succeeded;
+    bool puedeEditar = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Clientes.Editar)).Succeeded;
 }
 
 <div class="pagetitle">
@@ -20,9 +24,12 @@
 
             <div class="d-flex justify-content-between align-items-center">
                 <h5 class="card-title">Listado de clientes</h5>
+                @if (puedeCrear)
+                {
                 <a asp-action="Create" class="btn btn-primary btn-sm">
                     <i class="bi bi-plus-circle"></i> Nuevo cliente
                 </a>
+                }
             </div>
 
             <form asp-action="Index" method="get" class="row g-2 mb-3">
@@ -82,6 +89,8 @@
                                     </span>
                                 </td>
                                 <td class="text-end">
+                                    @if (puedeEditar)
+                                    {
                                     <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id"
                                        data-bs-toggle="tooltip" data-bs-title="Editar">
                                         <i class="bi bi-pencil-fill"></i>
@@ -107,6 +116,7 @@
                                             </button>
                                         }
                                     </form>
+                                    }
                                 </td>
                             </tr>
                         }

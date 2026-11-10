@@ -16,6 +16,7 @@ namespace TecniControl2026.Web.Core.Authorization
             public const string Ver = "Equipos.Ver";
             public const string Crear = "Equipos.Crear";
             public const string Editar = "Equipos.Editar";
+            public const string Eliminar = "Equipos.Eliminar";
         }
 
         public static class Ordenes
@@ -60,6 +61,7 @@ namespace TecniControl2026.Web.Core.Authorization
             new(Equipos.Ver, "Equipos", "Consultar equipos"),
             new(Equipos.Crear, "Equipos", "Registrar equipos"),
             new(Equipos.Editar, "Equipos", "Actualizar equipos"),
+            new(Equipos.Eliminar, "Equipos", "Eliminar equipos"),
 
             new(Ordenes.VerTodas, "Órdenes de servicio", "Consultar todas las órdenes"),
             new(Ordenes.VerAsignadas, "Órdenes de servicio", "Consultar las órdenes asignadas al usuario"),
@@ -101,6 +103,7 @@ namespace TecniControl2026.Web.Core.Authorization
                     {
                         PermisosCatalogo.Clientes.Ver, PermisosCatalogo.Clientes.Crear, PermisosCatalogo.Clientes.Editar,
                         PermisosCatalogo.Equipos.Ver, PermisosCatalogo.Equipos.Crear, PermisosCatalogo.Equipos.Editar,
+                        PermisosCatalogo.Equipos.Eliminar,
                         PermisosCatalogo.Ordenes.VerTodas, PermisosCatalogo.Ordenes.Crear, PermisosCatalogo.Ordenes.AsignarTecnico,
                         PermisosCatalogo.Ordenes.Entregar, PermisosCatalogo.Ordenes.Cancelar,
                         PermisosCatalogo.Seguimientos.Crear,
