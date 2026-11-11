@@ -121,15 +121,18 @@ namespace TecniControl2026.Web
         {
             app.UseNotyf();
 
+            SeedData(app);
+
             return app;
         }
 
-        public static async Task SeedDatabaseAsync(this WebApplication app)
+        private static void SeedData(WebApplication app)
         {
-            using IServiceScope scope = app.Services.CreateScope();
+            IServiceScopeFactory scopeFactory = app.Services.GetService<IServiceScopeFactory>();
 
-            SeedDb seedDb = scope.ServiceProvider.GetRequiredService<SeedDb>();
-            await seedDb.SeedAsync();
+            using IServiceScope scope = scopeFactory.CreateScope();
+            SeedDb service = scope.ServiceProvider.GetService<SeedDb>();
+            service.SeedAsync().Wait();
         }
     }
 }

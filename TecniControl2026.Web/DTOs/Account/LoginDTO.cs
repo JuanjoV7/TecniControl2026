@@ -4,17 +4,13 @@ namespace TecniControl2026.Web.DTOs.Account
 {
     public class LoginDTO
     {
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        [EmailAddress(ErrorMessage = "El campo {0} no es un correo válido.")]
-        [Display(Name = "Correo electrónico")]
-        public string Email { get; set; } = null!;
+        [Required(ErrorMessage = "El campo {0} es requerido.")]
+        [EmailAddress(ErrorMessage = "El campo {0} debe ser un Email válido")]
+        public required string Email { get; set; }
 
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        [DataType(DataType.Password)]
+        [Required(ErrorMessage = "El campo {0} es requerido.")]
+        [MinLength(4, ErrorMessage = "El campo {0} debe tener por lo menos {1} caracteres")]
         [Display(Name = "Contraseña")]
-        public string Password { get; set; } = null!;
-
-        [Display(Name = "Recordarme")]
-        public bool RememberMe { get; set; }
+        public required string Password { get; set; }
     }
 }

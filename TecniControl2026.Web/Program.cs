@@ -30,6 +30,4 @@ app.MapControllerRoute(
 
 app.AddCustomWebApplicationConfiguration();
 
-await app.SeedDatabaseAsync();
-
 app.Run();

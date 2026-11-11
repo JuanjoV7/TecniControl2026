@@ -34,40 +34,15 @@ namespace TecniControl2026.Web.Services.Implementations
             _emailService = emailService;
         }
 
-        public async Task<Response<object>> LoginAsync(LoginDTO dto)
+        public async Task<Response<SignInResult>> LoginAsync(LoginDTO dto)
         {
-            try
+            SignInResult result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false);
+
+            return new Response<SignInResult>
             {
-                User? user = await _userManager.FindByEmailAsync(dto.Email.Trim());
-
-                if (user is null)
-                {
-                    return Response<object>.Failure("Correo o contraseña incorrectos");
-                }
-
-                if (!user.IsActive)
-                {
-                    return Response<object>.Failure("El usuario está desactivado. Comuníquese con el administrador");
-                }
-
-                SignInResult result = await _signInManager.PasswordSignInAsync(user, dto.Password, dto.RememberMe, lockoutOnFailure: true);
-
-                if (result.IsLockedOut)
-                {
-                    return Response<object>.Failure("Usuario bloqueado temporalmente por varios intentos fallidos. Intente más tarde");
-                }
-
-                if (!result.Succeeded)
-                {
-                    return Response<object>.Failure("Correo o contraseña incorrectos");
-                }
-
-                return Response<object>.Success($"Bienvenido(a), {user.FirstName}");
-            }
-            catch (Exception ex)
-            {
-                return Response<object>.Failure(ex);
-            }
+                Result = result,
+                IsSuccess = result.Succeeded
+            };
         }
 
         public async Task LogoutAsync()
