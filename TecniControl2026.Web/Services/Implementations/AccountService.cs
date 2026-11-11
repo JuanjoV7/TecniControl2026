@@ -36,7 +36,20 @@ namespace TecniControl2026.Web.Services.Implementations
 
         public async Task<Response<SignInResult>> LoginAsync(LoginDTO dto)
         {
-            SignInResult result = await _signInManager.PasswordSignInAsync(dto.Email, dto.Password, false, false);
+            User? user = await _userManager.FindByEmailAsync(dto.Email.Trim());
+
+          
+            if (user is null || !user.IsActive)
+            {
+                return new Response<SignInResult>
+                {
+                    Result = SignInResult.Failed,
+                    IsSuccess = false
+                };
+            }
+
+            // lockoutOnFailure: true aplica el bloqueo de 5 intentos / 5 minutos
+            SignInResult result = await _signInManager.PasswordSignInAsync(user, dto.Password, false, true);
 
             return new Response<SignInResult>
             {
