@@ -3,6 +3,7 @@
 @{
     bool canShowCustomers = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Customers.Show)).Succeeded;
     bool canShowDevices = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Show)).Succeeded;
+    bool canShowUsers = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Users.Show)).Succeeded;
     bool canShowRoles = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Show)).Succeeded;
 }
 <aside id="sidebar" class="sidebar">
@@ -34,6 +35,16 @@
             </li>
         }
 
+        @if (canShowUsers)
+        {
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-controller="Users" asp-action="Index">
+                    <i class="bi bi-person-gear"></i>
+                    <span>Usuarios</span>
+                </a>
+            </li>
+        }
+
         @if (canShowRoles)
         {
             <li class="nav-item">
@@ -52,3 +63,4 @@
         </li>
     </ul>
 </aside>
+
