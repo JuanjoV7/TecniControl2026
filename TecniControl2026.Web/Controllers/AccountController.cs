@@ -65,13 +65,6 @@ namespace TecniControl2026.Web.Controllers
             return View(dto);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
-        {
-            await _accountService.LogoutAsync();
-            return RedirectToAction(nameof(Login));
-        }
-
         [HttpGet]
         public IActionResult AccessDenied()
         {
@@ -213,6 +206,14 @@ namespace TecniControl2026.Web.Controllers
             }
 
             _notyfService.Success(response.Message);
+            return RedirectToAction(nameof(Login));
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _accountService.LogoutAsync();
             return RedirectToAction(nameof(Login));
         }
 
