@@ -15,6 +15,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseRouting();
 
 app.UseAuthorization();
@@ -27,5 +29,7 @@ app.MapControllerRoute(
     .WithStaticAssets();
 
 app.AddCustomWebApplicationConfiguration();
+
+await app.SeedDatabaseAsync();
 
 app.Run();
