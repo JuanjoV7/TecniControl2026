@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using TecniControl2026.Web.Core.Authorization;
 using TecniControl2026.Web.Data;
 using TecniControl2026.Web.Data.Entities;
-using TecniControl2026.Web.Data.Seeding;
+using TecniControl2026.Web.Data.Seeders;
 using TecniControl2026.Web.Services.Abstractions;
 using TecniControl2026.Web.Services.Implementations;
 
@@ -25,7 +25,7 @@ namespace TecniControl2026.Web
             // Automapper
             builder.Services.AddAutoMapper(typeof(Program));
 
-            // Identity, autenticación y autorización
+            // Identity, authentication and authorization
             AddIdentity(builder);
             AddAuthorization(builder);
 
@@ -45,7 +45,7 @@ namespace TecniControl2026.Web
 
         private static void AddIdentity(WebApplicationBuilder builder)
         {
-            builder.Services.AddIdentityCore<Usuario>(options =>
+            builder.Services.AddIdentityCore<User>(options =>
             {
                 options.User.RequireUniqueEmail = true;
 
@@ -63,7 +63,7 @@ namespace TecniControl2026.Web
             .AddEntityFrameworkStores<DataContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders()
-            .AddClaimsPrincipalFactory<UsuarioClaimsPrincipalFactory>();
+            .AddClaimsPrincipalFactory<CustomUserClaimsPrincipalFactory>();
 
             builder.Services.AddAuthentication(IdentityConstants.ApplicationScheme)
                             .AddIdentityCookies();
@@ -77,13 +77,13 @@ namespace TecniControl2026.Web
                 options.SlidingExpiration = true;
             });
 
-            // Revisa con frecuencia el security stamp para cerrar las sesiones de usuarios desactivados
+            // Frequently checks the security stamp to close the sessions of deactivated users
             builder.Services.Configure<SecurityStampValidatorOptions>(options =>
             {
                 options.ValidationInterval = TimeSpan.FromMinutes(1);
             });
 
-            // Los tokens de recuperación de contraseña vencen en 2 horas
+            // Password recovery tokens expire in 2 hours
             builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
                 options.TokenLifespan = TimeSpan.FromHours(2);
@@ -93,28 +93,28 @@ namespace TecniControl2026.Web
         private static void AddAuthorization(WebApplicationBuilder builder)
         {
             builder.Services.AddAuthorization();
-            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermisoPolicyProvider>();
-            builder.Services.AddScoped<IAuthorizationHandler, PermisoAuthorizationHandler>();
+            builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+            builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
         }
 
         private static void AddServices(WebApplicationBuilder builder)
         {
             builder.Services.AddHttpContextAccessor();
 
-            // Infraestructura
+            // Infrastructure
             builder.Services.AddScoped<SeedDb>();
-            builder.Services.AddScoped<IPermisosService, PermisosService>();
-            builder.Services.AddScoped<IUsuarioActualService, UsuarioActualService>();
-            builder.Services.AddScoped<ICorreoService, LogCorreoService>();
+            builder.Services.AddScoped<IPermissionsService, PermissionsService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+            builder.Services.AddScoped<IEmailService, LogEmailService>();
 
-            // Negocio
+            // Business
             builder.Services.AddScoped<IAccountService, AccountService>();
-            builder.Services.AddScoped<IClientesService, ClientesService>();
-            builder.Services.AddScoped<IEquiposService, EquiposService>();
-            builder.Services.AddScoped<IOrdenesServicioService, OrdenesServicioService>();
+            builder.Services.AddScoped<ICustomersService, CustomersService>();
+            builder.Services.AddScoped<IDevicesService, DevicesService>();
+            builder.Services.AddScoped<IServiceOrdersService, ServiceOrdersService>();
             builder.Services.AddScoped<IRolesService, RolesService>();
-            builder.Services.AddScoped<ISeguimientosService, SeguimientosService>();
-            builder.Services.AddScoped<IUsuariosService, UsuariosService>();
+            builder.Services.AddScoped<IFollowUpsService, FollowUpsService>();
+            builder.Services.AddScoped<IUsersService, UsersService>();
         }
 
         public static WebApplication AddCustomWebApplicationConfiguration(this WebApplication app)

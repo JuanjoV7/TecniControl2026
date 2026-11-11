@@ -5,7 +5,7 @@ using TecniControl2026.Web.Core.Authorization;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.Data;
 using TecniControl2026.Web.Data.Entities;
-using TecniControl2026.Web.DTOs.Rol;
+using TecniControl2026.Web.DTOs.Role;
 using TecniControl2026.Web.Services.Abstractions;
 
 namespace TecniControl2026.Web.Services.Implementations
@@ -21,81 +21,81 @@ namespace TecniControl2026.Web.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<Response<RolDTO>> CreateAsync(CreateRolDTO dto)
+        public async Task<Response<RoleDTO>> CreateAsync(CreateRoleDTO dto)
         {
             try
             {
-                string nombre = dto.Nombre.Trim();
+                string name = dto.Name.Trim();
 
-                if (await _context.Roles.AnyAsync(r => r.Nombre == nombre))
+                if (await _context.Roles.AnyAsync(r => r.Name == name))
                 {
-                    return Response<RolDTO>.Failure("Ya existe un rol con ese nombre");
+                    return Response<RoleDTO>.Failure("Ya existe un rol con ese nombre");
                 }
 
-                List<Guid> permisoIds = await PermisosValidosAsync(dto.PermisoIds);
+                List<Guid> permissionIds = await ValidPermissionsAsync(dto.PermissionIds);
 
-                Rol rol = new Rol
+                Role role = new Role
                 {
                     Id = Guid.NewGuid(),
-                    Nombre = nombre,
-                    Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim(),
+                    Name = name,
+                    Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
                 };
 
-                foreach (Guid permisoId in permisoIds)
+                foreach (Guid permissionId in permissionIds)
                 {
-                    rol.RolPermisos.Add(new RolPermiso { RolId = rol.Id, PermisoId = permisoId });
+                    role.RolePermissions.Add(new RolePermission { RoleId = role.Id, PermissionId = permissionId });
                 }
 
-                await _context.Roles.AddAsync(rol);
+                await _context.Roles.AddAsync(role);
                 await _context.SaveChangesAsync();
 
-                Response<RolDTO> response = await GetOneAsync(rol.Id);
+                Response<RoleDTO> response = await GetOneAsync(role.Id);
                 response.Message = "Rol creado con éxito";
 
                 return response;
             }
             catch (Exception ex)
             {
-                return Response<RolDTO>.Failure(ex);
+                return Response<RoleDTO>.Failure(ex);
             }
         }
 
-        public async Task<Response<RolDTO>> GetOneAsync(Guid id)
+        public async Task<Response<RoleDTO>> GetOneAsync(Guid id)
         {
             try
             {
-                RolDTO? rol = await Proyectar(_context.Roles.Where(r => r.Id == id)).FirstOrDefaultAsync();
+                RoleDTO? role = await ProjectToDto(_context.Roles.Where(r => r.Id == id)).FirstOrDefaultAsync();
 
-                if (rol is null)
+                if (role is null)
                 {
-                    return Response<RolDTO>.Failure($"No existe rol con id {id}");
+                    return Response<RoleDTO>.Failure($"No existe rol con id {id}");
                 }
 
-                return Response<RolDTO>.Success(rol, "Rol obtenido con éxito");
+                return Response<RoleDTO>.Success(role, "Rol obtenido con éxito");
             }
             catch (Exception ex)
             {
-                return Response<RolDTO>.Failure(ex);
+                return Response<RoleDTO>.Failure(ex);
             }
         }
 
-        public async Task<Response<PaginationResponse<RolDTO>>> GetPaginationAsync(PaginationRequest request)
+        public async Task<Response<PaginationResponse<RoleDTO>>> GetPaginationAsync(PaginationRequest request)
         {
             try
             {
-                IQueryable<Rol> query = _context.Roles.AsQueryable();
+                IQueryable<Role> query = _context.Roles.AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(request.Filter))
                 {
                     string filter = request.Filter.Trim().ToLower();
 
-                    query = query.Where(r => r.Nombre.ToLower().Contains(filter)
-                                          || (r.Descripcion != null && r.Descripcion.ToLower().Contains(filter)));
+                    query = query.Where(r => r.Name.ToLower().Contains(filter)
+                                          || (r.Description != null && r.Description.ToLower().Contains(filter)));
                 }
 
-                PagedList<RolDTO> list = await PagedList<RolDTO>.ToPagedListAsync(Proyectar(query.OrderBy(r => r.Nombre)), request);
+                PagedList<RoleDTO> list = await PagedList<RoleDTO>.ToPagedListAsync(ProjectToDto(query.OrderBy(r => r.Name)), request);
 
-                PaginationResponse<RolDTO> dto = new PaginationResponse<RolDTO>
+                PaginationResponse<RoleDTO> dto = new PaginationResponse<RoleDTO>
                 {
                     List = list,
                     CurrentPage = list.CurrentPage,
@@ -105,94 +105,94 @@ namespace TecniControl2026.Web.Services.Implementations
                     Filter = request.Filter,
                 };
 
-                return Response<PaginationResponse<RolDTO>>.Success(dto, "Registros obtenidos con éxito");
+                return Response<PaginationResponse<RoleDTO>>.Success(dto, "Registros obtenidos con éxito");
             }
             catch (Exception ex)
             {
-                return Response<PaginationResponse<RolDTO>>.Failure(ex);
+                return Response<PaginationResponse<RoleDTO>>.Failure(ex);
             }
         }
 
-        public async Task<Response<List<RolDTO>>> GetAllAsync()
+        public async Task<Response<List<RoleDTO>>> GetAllAsync()
         {
             try
             {
-                List<RolDTO> roles = await Proyectar(_context.Roles.OrderBy(r => r.Nombre)).ToListAsync();
+                List<RoleDTO> roles = await ProjectToDto(_context.Roles.OrderBy(r => r.Name)).ToListAsync();
 
-                return Response<List<RolDTO>>.Success(roles);
+                return Response<List<RoleDTO>>.Success(roles);
             }
             catch (Exception ex)
             {
-                return Response<List<RolDTO>>.Failure(ex);
+                return Response<List<RoleDTO>>.Failure(ex);
             }
         }
 
-        public async Task<Response<List<PermisoDTO>>> GetPermisosAsync()
+        public async Task<Response<List<PermissionDTO>>> GetPermissionsAsync()
         {
             try
             {
-                List<Permiso> permisos = await _context.Permisos.OrderBy(p => p.Modulo)
-                                                                .ThenBy(p => p.Codigo)
+                List<Permission> permissions = await _context.Permissions.OrderBy(p => p.Module)
+                                                                .ThenBy(p => p.Code)
                                                                 .ToListAsync();
 
-                return Response<List<PermisoDTO>>.Success(_mapper.Map<List<PermisoDTO>>(permisos));
+                return Response<List<PermissionDTO>>.Success(_mapper.Map<List<PermissionDTO>>(permissions));
             }
             catch (Exception ex)
             {
-                return Response<List<PermisoDTO>>.Failure(ex);
+                return Response<List<PermissionDTO>>.Failure(ex);
             }
         }
 
-        public async Task<Response<RolDTO>> UpdateAsync(UpdateRolDTO dto)
+        public async Task<Response<RoleDTO>> UpdateAsync(UpdateRoleDTO dto)
         {
             try
             {
-                Rol? rol = await _context.Roles.Include(r => r.RolPermisos)
+                Role? role = await _context.Roles.Include(r => r.RolePermissions)
                                                .FirstOrDefaultAsync(r => r.Id == dto.Id);
 
-                if (rol is null)
+                if (role is null)
                 {
-                    return Response<RolDTO>.Failure($"No existe rol con id {dto.Id}");
+                    return Response<RoleDTO>.Failure($"No existe rol con id {dto.Id}");
                 }
 
-                // El administrador siempre conserva todos los permisos (ver SeedDb)
-                if (rol.Nombre == RolesBase.Administrador)
+                // The administrator always keeps every permission (see SeedDb)
+                if (role.Name == BaseRoles.Administrator)
                 {
-                    return Response<RolDTO>.Failure("El rol Administrador no se puede modificar");
+                    return Response<RoleDTO>.Failure("El rol Administrador no se puede modificar");
                 }
 
-                string nombre = dto.Nombre.Trim();
+                string name = dto.Name.Trim();
 
-                if (await _context.Roles.AnyAsync(r => r.Nombre == nombre && r.Id != dto.Id))
+                if (await _context.Roles.AnyAsync(r => r.Name == name && r.Id != dto.Id))
                 {
-                    return Response<RolDTO>.Failure("Ya existe otro rol con ese nombre");
+                    return Response<RoleDTO>.Failure("Ya existe otro rol con ese nombre");
                 }
 
-                rol.Nombre = nombre;
-                rol.Descripcion = string.IsNullOrWhiteSpace(dto.Descripcion) ? null : dto.Descripcion.Trim();
+                role.Name = name;
+                role.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
 
-                List<Guid> permisoIds = await PermisosValidosAsync(dto.PermisoIds);
+                List<Guid> permissionIds = await ValidPermissionsAsync(dto.PermissionIds);
 
-                List<RolPermiso> retirados = rol.RolPermisos.Where(rp => !permisoIds.Contains(rp.PermisoId)).ToList();
-                _context.RolPermisos.RemoveRange(retirados);
+                List<RolePermission> removed = role.RolePermissions.Where(rp => !permissionIds.Contains(rp.PermissionId)).ToList();
+                _context.RolePermissions.RemoveRange(removed);
 
-                IEnumerable<Guid> nuevos = permisoIds.Where(id => !rol.RolPermisos.Any(rp => rp.PermisoId == id));
+                IEnumerable<Guid> newPermissionIds = permissionIds.Where(id => !role.RolePermissions.Any(rp => rp.PermissionId == id));
 
-                foreach (Guid permisoId in nuevos)
+                foreach (Guid permissionId in newPermissionIds)
                 {
-                    rol.RolPermisos.Add(new RolPermiso { RolId = rol.Id, PermisoId = permisoId });
+                    role.RolePermissions.Add(new RolePermission { RoleId = role.Id, PermissionId = permissionId });
                 }
 
                 await _context.SaveChangesAsync();
 
-                Response<RolDTO> response = await GetOneAsync(rol.Id);
+                Response<RoleDTO> response = await GetOneAsync(role.Id);
                 response.Message = "Rol actualizado con éxito";
 
                 return response;
             }
             catch (Exception ex)
             {
-                return Response<RolDTO>.Failure(ex);
+                return Response<RoleDTO>.Failure(ex);
             }
         }
 
@@ -200,24 +200,24 @@ namespace TecniControl2026.Web.Services.Implementations
         {
             try
             {
-                Rol? rol = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
+                Role? role = await _context.Roles.FirstOrDefaultAsync(r => r.Id == id);
 
-                if (rol is null)
+                if (role is null)
                 {
                     return Response<object>.Failure($"No existe rol con id {id}");
                 }
 
-                if (rol.Nombre == RolesBase.Administrador)
+                if (role.Name == BaseRoles.Administrator)
                 {
                     return Response<object>.Failure("El rol Administrador no se puede eliminar");
                 }
 
-                if (await _context.Users.AnyAsync(u => u.RolId == id))
+                if (await _context.Users.AnyAsync(u => u.RoleId == id))
                 {
                     return Response<object>.Failure("No se puede eliminar un rol que tiene usuarios asignados");
                 }
 
-                _context.Roles.Remove(rol);
+                _context.Roles.Remove(role);
                 await _context.SaveChangesAsync();
 
                 return Response<object>.Success("Rol eliminado con éxito");
@@ -228,29 +228,29 @@ namespace TecniControl2026.Web.Services.Implementations
             }
         }
 
-        private async Task<List<Guid>> PermisosValidosAsync(List<Guid> permisoIds)
+        private async Task<List<Guid>> ValidPermissionsAsync(List<Guid> permissionIds)
         {
-            List<Guid> ids = permisoIds.Distinct().ToList();
+            List<Guid> ids = permissionIds.Distinct().ToList();
 
-            return await _context.Permisos.Where(p => ids.Contains(p.Id))
+            return await _context.Permissions.Where(p => ids.Contains(p.Id))
                                           .Select(p => p.Id)
                                           .ToListAsync();
         }
 
-        private IQueryable<RolDTO> Proyectar(IQueryable<Rol> query)
+        private IQueryable<RoleDTO> ProjectToDto(IQueryable<Role> query)
         {
-            return query.Select(r => new RolDTO
+            return query.Select(r => new RoleDTO
             {
                 Id = r.Id,
-                Nombre = r.Nombre,
-                Descripcion = r.Descripcion,
-                CantidadUsuarios = r.Usuarios.Count,
-                Permisos = r.RolPermisos.Select(rp => new PermisoDTO
+                Name = r.Name,
+                Description = r.Description,
+                UserCount = r.Users.Count,
+                Permissions = r.RolePermissions.Select(rp => new PermissionDTO
                 {
-                    Id = rp.Permiso.Id,
-                    Codigo = rp.Permiso.Codigo,
-                    Modulo = rp.Permiso.Modulo,
-                    Descripcion = rp.Permiso.Descripcion,
+                    Id = rp.Permission.Id,
+                    Code = rp.Permission.Code,
+                    Module = rp.Permission.Module,
+                    Description = rp.Permission.Description,
                 }).ToList(),
             });
         }

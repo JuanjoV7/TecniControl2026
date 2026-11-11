@@ -5,29 +5,29 @@ using TecniControl2026.Web.Data.Entities;
 
 namespace TecniControl2026.Web.Data
 {
-    // IdentityUserContext aporta las tablas de usuarios (contraseñas, tokens de recuperación, etc.)
-    // sin las tablas de roles de Identity: los roles y permisos son propios del sistema.
-    public class DataContext : IdentityUserContext<Usuario, Guid>
+    // IdentityUserContext provides the user tables (passwords, recovery tokens, etc.)
+    // without Identity's role tables: roles and permissions belong to the system.
+    public class DataContext : IdentityUserContext<User, Guid>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
 
-        public DbSet<Cliente> Clientes { get; set; }
-        public DbSet<Equipo> Equipos { get; set; }
-        public DbSet<OrdenServicio> OrdenesServicio { get; set; }
-        public DbSet<Permiso> Permisos { get; set; }
-        public DbSet<Rol> Roles { get; set; }
-        public DbSet<RolPermiso> RolPermisos { get; set; }
-        public DbSet<Seguimiento> Seguimientos { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+        public DbSet<Device> Devices { get; set; }
+        public DbSet<ServiceOrder> ServiceOrders { get; set; }
+        public DbSet<Permission> Permissions { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<FollowUp> FollowUps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UsuarioClaims");
-            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UsuarioLogins");
-            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UsuarioTokens");
+            modelBuilder.Entity<IdentityUserClaim<Guid>>().ToTable("UserClaims");
+            modelBuilder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
+            modelBuilder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DataContext).Assembly);
         }
