@@ -1,1 +1,203 @@
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model PaginationResponse<UserDTO>
+
+@{
+    ViewData["Title"] = "Usuarios";
+    Guid? currentUserId = ViewBag.CurrentUserId as Guid?;
+    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Users.Create)).Succeeded;
+    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Users.Update)).Succeeded;
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">Listado de usuarios</h5>
+                @if (canCreate)
+                {
+                    <a asp-action="Create" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-circle"></i> Nuevo usuario
+                    </a>
+                }
+            </div>
+
+            <form asp-action="Index" method="get" class="row g-2 mb-3">
+                <input type="hidden" name="Page" value="1" />
+
+                <div class="col-auto">
+                    <select asp-for="RecordsPerPage" class="form-select" onchange="this.form.submit()">
+                        <option value="10" selected="@(Model.RecordsPerPage == 10)">10</option>
+                        <option value="15" selected="@(Model.RecordsPerPage == 15)">15</option>
+                        <option value="30" selected="@(Model.RecordsPerPage == 30)">30</option>
+                        <option value="50" selected="@(Model.RecordsPerPage == 50)">50</option>
+                    </select>
+                </div>
+
+                <div class="col">
+                    <div class="input-group">
+                        <input asp-for="Filter" type="text" class="form-control"
+                               placeholder="Buscar por nombre, documento, correo o rol..."
+                               aria-label="Buscar" />
+                        <button type="submit" class="btn btn-primary" aria-label="Buscar">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Teléfono</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.List.Any())
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No se encontraron usuarios.</td>
+                            </tr>
+                        }
+
+                        @foreach (UserDTO item in Model.List)
+                        {
+                            bool isSelf = item.Id == currentUserId;
+
+                            <tr class="@(item.IsActive ? "" : "table-secondary")">
+                                <td>@item.Document</td>
+                                <td>@item.FullName</td>
+                                <td>@item.Email</td>
+                                <td>@item.PhoneNumber</td>
+                                <td><span class="badge bg-info text-dark">@item.RoleName</span></td>
+                                <td>
+                                    <span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">
+                                        @(item.IsActive ? "Activo" : "Inactivo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    @if (canUpdate)
+                                    {
+                                        <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id"
+                                           data-bs-toggle="tooltip" data-bs-title="Editar">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </a>
+
+                                        @if (!isSelf)
+                                        {
+                                            <form asp-action="Toggle" method="post" class="d-inline">
+                                                <input type="hidden" name="UserId" value="@item.Id" />
+                                                <input type="hidden" name="IsActive" value="@((!item.IsActive).ToString().ToLower())" />
+
+                                                @if (item.IsActive)
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-danger btnDeactivate"
+                                                            data-bs-toggle="tooltip" data-bs-title="Desactivar"
+                                                            data-name="@item.FullName">
+                                                        <i class="bi bi-person-x-fill"></i>
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                            data-bs-toggle="tooltip" data-bs-title="Activar">
+                                                        <i class="bi bi-person-check-fill"></i>
+                                                    </button>
+                                                }
+                                            </form>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <nav aria-label="Paginación de usuarios">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-Page="1"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item @(!Model.HasPrevious ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-Page="@(Model.CurrentPage - 1)"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+                    @foreach (int pageNumber in Model.Pages)
+                    {
+                        <li class="page-item @(Model.CurrentPage == pageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-Page="@(pageNumber)"
+                               asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
+                                @(pageNumber)
+                            </a>
+                        </li>
+                    }
+                    <li class="page-item @(!Model.HasNext ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-Page="@(Model.CurrentPage + 1)"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item @(Model.CurrentPage >= Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-Page="@Model.TotalPages"
+                           asp-route-RecordsPerPage="@Model.RecordsPerPage" asp-route-Filter="@Model.Filter">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            .forEach(el => new bootstrap.Tooltip(el));
+
+        $(document).on('click', '.btnDeactivate', function (event) {
+            event.preventDefault();
+
+            const form = $(this).closest('form');
+            const name = $(this).data('name');
+
+            Swal.fire({
+                icon: 'question',
+                title: '¿Desea desactivar al usuario?',
+                text: name + ' no podrá iniciar sesión mientras esté inactivo.',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, desactivar',
+                cancelButtonText: 'Cancelar'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    form.trigger('submit');
+                }
+            });
+        });
+    </script>
+}
 
