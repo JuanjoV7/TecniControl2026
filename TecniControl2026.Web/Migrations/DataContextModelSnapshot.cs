@@ -8,7 +8,7 @@ using TecniControl2026.Web.Data;
 
 #nullable disable
 
-namespace TecniControl2026.web.Migrations
+namespace TecniControl2026.Web.Migrations
 {
     [DbContext(typeof(DataContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
@@ -43,7 +43,7 @@ namespace TecniControl2026.web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UsuarioClaims", (string)null);
+                    b.ToTable("UserClaims", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
@@ -64,7 +64,7 @@ namespace TecniControl2026.web.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UsuarioLogins", (string)null);
+                    b.ToTable("UserLogins", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
@@ -83,19 +83,16 @@ namespace TecniControl2026.web.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("UsuarioTokens", (string)null);
+                    b.ToTable("UserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Cliente", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Documento")
+                    b.Property<string>("Document")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -104,239 +101,242 @@ namespace TecniControl2026.web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Nombre")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Telefono")
+                    b.Property<string>("Phone")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Documento")
+                    b.HasIndex("Document")
                         .IsUnique();
 
-                    b.ToTable("Clientes");
+                    b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Equipo", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Device", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ClienteId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Marca")
+                    b.Property<string>("Brand")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Modelo")
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DeviceModel")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Serial")
+                    b.Property<string>("SerialNumber")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Tipo")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClienteId");
+                    b.HasIndex("CustomerId");
 
-                    b.HasIndex("Serial")
+                    b.HasIndex("SerialNumber")
                         .IsUnique()
-                        .HasFilter("[Serial] IS NOT NULL");
+                        .HasFilter("[SerialNumber] IS NOT NULL");
 
-                    b.ToTable("Equipos", (string)null);
+                    b.ToTable("Devices", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.OrdenServicio", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.FollowUp", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Accesorios")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("Diagnostico")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<Guid>("EquipoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Estado")
-                        .IsRequired()
+                    b.Property<string>("NewStatus")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("FallaReportada")
+                    b.Property<string>("Observation")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
-                    b.Property<DateTime?>("FechaCancelacion")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("PreviousStatus")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
-                    b.Property<DateTime?>("FechaEntrega")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FechaRecepcion")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("MotivoCancelacion")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("Numero")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Numero"));
-
-                    b.Property<Guid>("RecibidaPorId")
+                    b.Property<Guid>("ServiceOrderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("TecnicoId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("TrabajoRealizado")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EquipoId");
+                    b.HasIndex("ServiceOrderId");
 
-                    b.HasIndex("Estado");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("Numero")
-                        .IsUnique();
-
-                    b.HasIndex("RecibidaPorId");
-
-                    b.HasIndex("TecnicoId");
-
-                    b.ToTable("OrdenesServicio", (string)null);
+                    b.ToTable("FollowUps", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Permiso", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Permission", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Codigo")
+                    b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Modulo")
+                    b.Property<string>("Module")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Codigo")
+                    b.HasIndex("Code")
                         .IsUnique();
 
-                    b.ToTable("Permisos", (string)null);
+                    b.ToTable("Permissions", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Rol", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Descripcion")
+                    b.Property<string>("Description")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<string>("Nombre")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Nombre")
+                    b.HasIndex("Name")
                         .IsUnique();
 
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.RolPermiso", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.RolePermission", b =>
                 {
-                    b.Property<Guid>("RolId")
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PermisoId")
+                    b.Property<Guid>("PermissionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("RolId", "PermisoId");
+                    b.HasKey("RoleId", "PermissionId");
 
-                    b.HasIndex("PermisoId");
+                    b.HasIndex("PermissionId");
 
-                    b.ToTable("RolPermisos", (string)null);
+                    b.ToTable("RolePermissions", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Seguimiento", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.ServiceOrder", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("EstadoAnterior")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                    b.Property<string>("Accessories")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("EstadoNuevo")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<DateTime>("Fecha")
+                    b.Property<DateTime?>("CancellationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Observacion")
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("DeviceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Diagnosis")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<int>("Number")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Number"));
+
+                    b.Property<Guid>("ReceivedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReceptionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReportedIssue")
                         .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
-                    b.Property<Guid>("OrdenServicioId")
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<Guid?>("TechnicianId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UsuarioId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("WorkPerformed")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdenServicioId");
+                    b.HasIndex("DeviceId");
 
-                    b.HasIndex("UsuarioId");
+                    b.HasIndex("Number")
+                        .IsUnique();
 
-                    b.ToTable("Seguimientos", (string)null);
+                    b.HasIndex("ReceivedById");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TechnicianId");
+
+                    b.ToTable("ServiceOrders", (string)null);
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Usuario", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -345,19 +345,11 @@ namespace TecniControl2026.web.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Apellidos")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Documento")
+                    b.Property<string>("Document")
                         .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
@@ -369,16 +361,24 @@ namespace TecniControl2026.web.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Nombres")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -397,7 +397,7 @@ namespace TecniControl2026.web.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("RolId")
+                    b.Property<Guid>("RoleId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SecurityStamp")
@@ -412,7 +412,7 @@ namespace TecniControl2026.web.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Documento")
+                    b.HasIndex("Document")
                         .IsUnique();
 
                     b.HasIndex("NormalizedEmail")
@@ -423,14 +423,14 @@ namespace TecniControl2026.web.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
-                    b.HasIndex("RolId");
+                    b.HasIndex("RoleId");
 
-                    b.ToTable("Usuarios", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", null)
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -439,7 +439,7 @@ namespace TecniControl2026.web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", null)
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -448,124 +448,124 @@ namespace TecniControl2026.web.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", null)
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Equipo", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Device", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Cliente", "Cliente")
-                        .WithMany("Equipos")
-                        .HasForeignKey("ClienteId")
+                    b.HasOne("TecniControl2026.Web.Data.Entities.Customer", "Customer")
+                        .WithMany("Devices")
+                        .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Cliente");
+                    b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.OrdenServicio", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.FollowUp", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Equipo", "Equipo")
-                        .WithMany("OrdenesServicio")
-                        .HasForeignKey("EquipoId")
+                    b.HasOne("TecniControl2026.Web.Data.Entities.ServiceOrder", "ServiceOrder")
+                        .WithMany("FollowUps")
+                        .HasForeignKey("ServiceOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", "RecibidaPor")
-                        .WithMany()
-                        .HasForeignKey("RecibidaPorId")
+                    b.Navigation("ServiceOrder");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.RolePermission", b =>
+                {
+                    b.HasOne("TecniControl2026.Web.Data.Entities.Permission", "Permission")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("PermissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TecniControl2026.Web.Data.Entities.Role", "Role")
+                        .WithMany("RolePermissions")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Permission");
+
+                    b.Navigation("Role");
+                });
+
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.ServiceOrder", b =>
+                {
+                    b.HasOne("TecniControl2026.Web.Data.Entities.Device", "Device")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("DeviceId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", "Tecnico")
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", "ReceivedBy")
                         .WithMany()
-                        .HasForeignKey("TecnicoId")
+                        .HasForeignKey("ReceivedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TecniControl2026.Web.Data.Entities.User", "Technician")
+                        .WithMany()
+                        .HasForeignKey("TechnicianId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("Equipo");
+                    b.Navigation("Device");
 
-                    b.Navigation("RecibidaPor");
+                    b.Navigation("ReceivedBy");
 
-                    b.Navigation("Tecnico");
+                    b.Navigation("Technician");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.RolPermiso", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.User", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Permiso", "Permiso")
-                        .WithMany("RolPermisos")
-                        .HasForeignKey("PermisoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Rol", "Rol")
-                        .WithMany("RolPermisos")
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permiso");
-
-                    b.Navigation("Rol");
-                });
-
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Seguimiento", b =>
-                {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.OrdenServicio", "OrdenServicio")
-                        .WithMany("Seguimientos")
-                        .HasForeignKey("OrdenServicioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
+                    b.HasOne("TecniControl2026.Web.Data.Entities.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("OrdenServicio");
-
-                    b.Navigation("Usuario");
+                    b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Usuario", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Customer", b =>
                 {
-                    b.HasOne("TecniControl2026.Web.Data.Entities.Rol", "Rol")
-                        .WithMany("Usuarios")
-                        .HasForeignKey("RolId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Rol");
+                    b.Navigation("Devices");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Cliente", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Device", b =>
                 {
-                    b.Navigation("Equipos");
+                    b.Navigation("ServiceOrders");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Equipo", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Permission", b =>
                 {
-                    b.Navigation("OrdenesServicio");
+                    b.Navigation("RolePermissions");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.OrdenServicio", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Role", b =>
                 {
-                    b.Navigation("Seguimientos");
+                    b.Navigation("RolePermissions");
+
+                    b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Permiso", b =>
+            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.ServiceOrder", b =>
                 {
-                    b.Navigation("RolPermisos");
-                });
-
-            modelBuilder.Entity("TecniControl2026.Web.Data.Entities.Rol", b =>
-                {
-                    b.Navigation("RolPermisos");
-
-                    b.Navigation("Usuarios");
+                    b.Navigation("FollowUps");
                 });
 #pragma warning restore 612, 618
         }
