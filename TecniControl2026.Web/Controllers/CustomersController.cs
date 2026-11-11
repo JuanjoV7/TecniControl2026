@@ -1,6 +1,7 @@
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using TecniControl2026.Web.Core;
+using TecniControl2026.Web.Core.Authorization;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.DTOs.Customer;
 using TecniControl2026.Web.Services.Abstractions;
@@ -19,6 +20,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Customers.Show)]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<CustomerDTO>> response = await _customersService.GetPaginationAsync(request);
@@ -33,12 +35,14 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Customers.Create)]
         public IActionResult Create()
         {
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Customers.Create)]
         public async Task<IActionResult> Create([FromForm] CreateCustomerDTO dto)
         {
             if (!ModelState.IsValid)
@@ -60,11 +64,12 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Customers.Update)]
         public async Task<IActionResult> Edit([FromRoute] Guid id)
         {
             Response<CustomerDTO> response = await _customersService.GetOneAsync(id);
 
-            if (!response.IsSuccess)
+            if (!response.IsSuccess || response.Result is null)
             {
                 _notyfService.Error(response.Message);
                 return RedirectToAction(nameof(Index));
@@ -83,7 +88,8 @@ namespace TecniControl2026.Web.Controllers
             return View(dto);
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Customers.Update)]
         public async Task<IActionResult> Edit([FromForm] UpdateCustomerDTO dto)
         {
             if (!ModelState.IsValid)
@@ -104,7 +110,8 @@ namespace TecniControl2026.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Customers.Update)]
         public async Task<IActionResult> Toggle(ToggleCustomerStatusDTO dto)
         {
             Response<object> response = await _customersService.ToggleAsync(dto);

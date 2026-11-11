@@ -128,10 +128,10 @@ namespace TecniControl2026.Web
 
         private static void SeedData(WebApplication app)
         {
-            IServiceScopeFactory scopeFactory = app.Services.GetService<IServiceScopeFactory>();
+            IServiceScopeFactory scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 
             using IServiceScope scope = scopeFactory.CreateScope();
-            SeedDb service = scope.ServiceProvider.GetService<SeedDb>();
+            SeedDb service = scope.ServiceProvider.GetRequiredService<SeedDb>();
             service.SeedAsync().Wait();
         }
     }

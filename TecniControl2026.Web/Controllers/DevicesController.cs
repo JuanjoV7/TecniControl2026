@@ -2,6 +2,7 @@ using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TecniControl2026.Web.Core;
+using TecniControl2026.Web.Core.Authorization;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.DTOs.Customer;
 using TecniControl2026.Web.DTOs.Device;
@@ -26,6 +27,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Devices.Show)]
         public async Task<IActionResult> Index([FromQuery] PaginationRequest request)
         {
             Response<PaginationResponse<DeviceDTO>> response = await _devicesService.GetPaginationAsync(request);
@@ -40,6 +42,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Devices.Create)]
         public async Task<IActionResult> Create()
         {
             if (!await LoadCustomersAsync())
@@ -50,7 +53,8 @@ namespace TecniControl2026.Web.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Devices.Create)]
         public async Task<IActionResult> Create([FromForm] CreateDeviceDTO dto)
         {
             if (!ModelState.IsValid)
@@ -74,6 +78,7 @@ namespace TecniControl2026.Web.Controllers
         }
 
         [HttpGet]
+        [HasPermission(PermissionsCatalog.Devices.Update)]
         public async Task<IActionResult> Edit([FromRoute] Guid id)
         {
             Response<DeviceDTO> response = await _devicesService.GetOneAsync(id);
@@ -102,7 +107,8 @@ namespace TecniControl2026.Web.Controllers
             return View(dto);
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Devices.Update)]
         public async Task<IActionResult> Edit([FromForm] UpdateDeviceDTO dto)
         {
             if (!ModelState.IsValid)
@@ -125,7 +131,8 @@ namespace TecniControl2026.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost]
+        [HttpPost, ValidateAntiForgeryToken]
+        [HasPermission(PermissionsCatalog.Devices.Delete)]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
             Response<object> response = await _devicesService.DeleteAsync(id);

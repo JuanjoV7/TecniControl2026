@@ -16,6 +16,7 @@ namespace TecniControl2026.Web.Core.Authorization
             public const string Show = "devices.show";
             public const string Create = "devices.create";
             public const string Update = "devices.update";
+            public const string Delete = "devices.delete";
         }
 
         public static class Orders
@@ -60,6 +61,7 @@ namespace TecniControl2026.Web.Core.Authorization
             new(Devices.Show, "Equipos", "Consultar equipos"),
             new(Devices.Create, "Equipos", "Registrar equipos"),
             new(Devices.Update, "Equipos", "Actualizar equipos"),
+            new(Devices.Delete, "Equipos", "Eliminar equipos sin órdenes de servicio asociadas"),
 
             new(Orders.ShowAll, "Órdenes de servicio", "Consultar todas las órdenes"),
             new(Orders.ShowAssigned, "Órdenes de servicio", "Consultar las órdenes asignadas al usuario"),
@@ -101,6 +103,7 @@ namespace TecniControl2026.Web.Core.Authorization
                     {
                         PermissionsCatalog.Customers.Show, PermissionsCatalog.Customers.Create, PermissionsCatalog.Customers.Update,
                         PermissionsCatalog.Devices.Show, PermissionsCatalog.Devices.Create, PermissionsCatalog.Devices.Update,
+                        PermissionsCatalog.Devices.Delete,
                         PermissionsCatalog.Orders.ShowAll, PermissionsCatalog.Orders.Create, PermissionsCatalog.Orders.AssignTechnician,
                         PermissionsCatalog.Orders.Deliver, PermissionsCatalog.Orders.Cancel,
                         PermissionsCatalog.FollowUps.Create,
