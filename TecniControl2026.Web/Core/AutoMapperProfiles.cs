@@ -1,11 +1,11 @@
 using AutoMapper;
 using TecniControl2026.Web.Data.Entities;
-using TecniControl2026.Web.DTOs.Cliente;
-using TecniControl2026.Web.DTOs.Equipo;
-using TecniControl2026.Web.DTOs.OrdenServicio;
-using TecniControl2026.Web.DTOs.Rol;
-using TecniControl2026.Web.DTOs.Seguimiento;
-using TecniControl2026.Web.DTOs.Usuario;
+using TecniControl2026.Web.DTOs.Customer;
+using TecniControl2026.Web.DTOs.Device;
+using TecniControl2026.Web.DTOs.ServiceOrder;
+using TecniControl2026.Web.DTOs.Role;
+using TecniControl2026.Web.DTOs.FollowUp;
+using TecniControl2026.Web.DTOs.User;
 
 namespace TecniControl2026.Web.Core
 {
@@ -13,45 +13,45 @@ namespace TecniControl2026.Web.Core
     {
         public AutoMapperProfiles()
         {
-            // Clientes
-            CreateMap<Cliente, ClienteDTO>().ReverseMap();
+            // Customers
+            CreateMap<Customer, CustomerDTO>().ReverseMap();
 
-            CreateMap<Cliente, CreateClienteDTO>().ReverseMap();
+            CreateMap<Customer, CreateCustomerDTO>().ReverseMap();
 
-            CreateMap<Cliente, UpdateClienteDTO>().ReverseMap();
+            CreateMap<Customer, UpdateCustomerDTO>().ReverseMap();
 
-            // Equipos (ClienteNombre y ClienteDocumento se aplanan desde Cliente)
-            CreateMap<Equipo, EquipoDTO>();
+            // Devices (CustomerName and CustomerDocument are flattened from Customer)
+            CreateMap<Device, DeviceDTO>();
 
-            CreateMap<CreateEquipoDTO, Equipo>();
+            CreateMap<CreateDeviceDTO, Device>();
 
-            CreateMap<UpdateEquipoDTO, Equipo>();
+            CreateMap<UpdateDeviceDTO, Device>();
 
-            CreateMap<Equipo, UpdateEquipoDTO>();
+            CreateMap<Device, UpdateDeviceDTO>();
 
-            // Órdenes de servicio
-            CreateMap<OrdenServicio, OrdenServicioDTO>()
-                .ForMember(d => d.EquipoDescripcion, o => o.MapFrom(s => s.Equipo.Tipo + " " + s.Equipo.Marca + " " + s.Equipo.Modelo))
-                .ForMember(d => d.ClienteId, o => o.MapFrom(s => s.Equipo.ClienteId))
-                .ForMember(d => d.ClienteNombre, o => o.MapFrom(s => s.Equipo.Cliente.Nombre))
-                .ForMember(d => d.TecnicoNombre, o => o.MapFrom(s => s.Tecnico != null ? s.Tecnico.Nombres + " " + s.Tecnico.Apellidos : null));
+            // Service orders
+            CreateMap<ServiceOrder, ServiceOrderDTO>()
+                .ForMember(d => d.DeviceDescription, o => o.MapFrom(s => s.Device.Type + " " + s.Device.Brand + " " + s.Device.DeviceModel))
+                .ForMember(d => d.CustomerId, o => o.MapFrom(s => s.Device.CustomerId))
+                .ForMember(d => d.CustomerName, o => o.MapFrom(s => s.Device.Customer.Name))
+                .ForMember(d => d.TechnicianName, o => o.MapFrom(s => s.Technician != null ? s.Technician.FirstName + " " + s.Technician.LastName : null));
 
-            CreateMap<OrdenServicio, OrdenServicioDetalleDTO>()
-                .IncludeBase<OrdenServicio, OrdenServicioDTO>()
-                .ForMember(d => d.ClienteTelefono, o => o.MapFrom(s => s.Equipo.Cliente.Telefono))
-                .ForMember(d => d.RecibidaPorNombre, o => o.MapFrom(s => s.RecibidaPor.Nombres + " " + s.RecibidaPor.Apellidos));
+            CreateMap<ServiceOrder, ServiceOrderDetailDTO>()
+                .IncludeBase<ServiceOrder, ServiceOrderDTO>()
+                .ForMember(d => d.CustomerPhone, o => o.MapFrom(s => s.Device.Customer.Phone))
+                .ForMember(d => d.ReceivedByName, o => o.MapFrom(s => s.ReceivedBy.FirstName + " " + s.ReceivedBy.LastName));
 
-            // Seguimientos
-            CreateMap<Seguimiento, SeguimientoDTO>()
-                .ForMember(d => d.UsuarioNombre, o => o.MapFrom(s => s.Usuario.Nombres + " " + s.Usuario.Apellidos));
+            // Follow-ups
+            CreateMap<FollowUp, FollowUpDTO>()
+                .ForMember(d => d.UserFullName, o => o.MapFrom(s => s.User.FirstName + " " + s.User.LastName));
 
-            // Usuarios (RolNombre se aplana desde Rol)
-            CreateMap<Usuario, UsuarioDTO>();
+            // Users (RoleName is flattened from Role)
+            CreateMap<User, UserDTO>();
 
-            CreateMap<Usuario, UpdateUsuarioDTO>();
+            CreateMap<User, UpdateUserDTO>();
 
-            // Roles y permisos
-            CreateMap<Permiso, PermisoDTO>();
+            // Roles and permissions
+            CreateMap<Permission, PermissionDTO>();
         }
     }
 }

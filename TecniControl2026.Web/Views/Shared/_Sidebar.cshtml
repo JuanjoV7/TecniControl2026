@@ -1,27 +1,54 @@
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
-
 @{
-    bool puedeVerRoles = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Roles.Ver)).Succeeded;
-    bool puedeVerClientes = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Clientes.Ver)).Succeeded;
-    bool puedeVerEquipos = (await AuthorizationService.AuthorizeAsync(User, PermisosCatalogo.Equipos.Ver)).Succeeded;
+    bool canShowCustomers = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Customers.Show)).Succeeded;
+    bool canShowDevices = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Devices.Show)).Succeeded;
+    bool canShowRoles = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Roles.Show)).Succeeded;
 }
-
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
-        <li class="nav-item"><a class="nav-link collapsed" asp-controller="Home" asp-action="Index"><i class="bi bi-grid"></i><span>Inicio</span></a></li>
-        @if (puedeVerClientes)
+        <li class="nav-item">
+            <a class="nav-link collapsed" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-grid"></i>
+                <span>Inicio</span>
+            </a>
+        </li>
+
+        @if (canShowCustomers)
         {
-            <li class="nav-item"><a class="nav-link collapsed" asp-controller="Clientes" asp-action="Index"><i class="bi bi-people"></i><span>Clientes</span></a></li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-controller="Customers" asp-action="Index">
+                    <i class="bi bi-people"></i>
+                    <span>Clientes</span>
+                </a>
+            </li>
         }
-        @if (puedeVerEquipos)
+
+        @if (canShowDevices)
         {
-            <li class="nav-item"><a class="nav-link collapsed" asp-controller="Equipos" asp-action="Index"><i class="bi bi-pc-display"></i><span>Equipos</span></a></li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-controller="Devices" asp-action="Index">
+                    <i class="bi bi-pc-display"></i>
+                    <span>Equipos</span>
+                </a>
+            </li>
         }
-        <li class="nav-item"><a class="nav-link collapsed" asp-controller="Notificaciones" asp-action="Index"><i class="bi bi-bell"></i><span>Notificaciones</span></a></li>
-        @if (puedeVerRoles)
+
+        @if (canShowRoles)
         {
-            <li class="nav-item"><a class="nav-link collapsed" asp-controller="Roles" asp-action="Index"><i class="bi bi-shield-lock"></i><span>Roles y permisos</span></a></li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-controller="Roles" asp-action="Index">
+                    <i class="bi bi-shield-lock"></i>
+                    <span>Roles y permisos</span>
+                </a>
+            </li>
         }
+
+        <li class="nav-item">
+            <a class="nav-link collapsed" asp-controller="Notifications" asp-action="Index">
+                <i class="bi bi-bell"></i>
+                <span>Notificaciones</span>
+            </a>
+        </li>
     </ul>
 </aside>

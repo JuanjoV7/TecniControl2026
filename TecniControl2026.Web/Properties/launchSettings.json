@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "TecniControl2026.web": {
+    "TecniControl2026.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

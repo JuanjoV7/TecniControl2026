@@ -1,24 +1,24 @@
-@model CreateRolDTO
+@model CreateRoleDTO
 @{
-    List<PermisoDTO> permisos = ViewBag.Permisos as List<PermisoDTO> ?? new();
+    List<PermissionDTO> permissions = ViewBag.Permissions as List<PermissionDTO> ?? new();
 }
 <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
-<div class="col-md-6"><div class="form-floating"><input asp-for="Nombre" class="form-control" placeholder="Nombre" /><label asp-for="Nombre"></label><span asp-validation-for="Nombre" class="text-danger"></span></div></div>
-<div class="col-md-6"><div class="form-floating"><input asp-for="Descripcion" class="form-control" placeholder="Descripción" /><label asp-for="Descripcion"></label><span asp-validation-for="Descripcion" class="text-danger"></span></div></div>
+<div class="col-md-6"><div class="form-floating"><input asp-for="Name" class="form-control" placeholder="Nombre" /><label asp-for="Name"></label><span asp-validation-for="Name" class="text-danger"></span></div></div>
+<div class="col-md-6"><div class="form-floating"><input asp-for="Description" class="form-control" placeholder="Descripción" /><label asp-for="Description"></label><span asp-validation-for="Description" class="text-danger"></span></div></div>
 <div class="col-12">
     <h5 class="card-title pb-0">Permisos</h5>
     <p class="text-muted">Seleccione las acciones que podrán realizar los usuarios que tengan este rol.</p>
     <div class="row g-3">
-        @foreach (IGrouping<string, PermisoDTO> modulo in permisos.GroupBy(p => p.Modulo))
+        @foreach (IGrouping<string, PermissionDTO> module in permissions.GroupBy(permission => permission.Module))
         {
             <div class="col-md-6 col-xl-4"><div class="card h-100 border"><div class="card-body">
-                <h6 class="card-title">@modulo.Key</h6>
-                @foreach (PermisoDTO permiso in modulo)
+                <h6 class="card-title">@module.Key</h6>
+                @foreach (PermissionDTO permission in module)
                 {
-                    string controlId = $"permiso-{permiso.Id}";
+                    string controlId = $"permission-{permission.Id}";
                     <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" id="@controlId" name="PermisoIds" value="@permiso.Id" checked="@(Model.PermisoIds.Contains(permiso.Id))" />
-                        <label class="form-check-label" for="@controlId">@permiso.Descripcion</label>
+                        <input class="form-check-input" type="checkbox" id="@controlId" name="PermissionIds" value="@permission.Id" checked="@(Model.PermissionIds.Contains(permission.Id))" />
+                        <label class="form-check-label" for="@controlId">@permission.Description</label>
                     </div>
                 }
             </div></div></div>

@@ -8,11 +8,11 @@ namespace TecniControl2026.Web.Services.Abstractions
         public Task<Response<object>> LoginAsync(LoginDTO dto);
         public Task LogoutAsync();
         public Task<Response<object>> ChangePasswordAsync(ChangePasswordDTO dto);
-        public Task<Response<PerfilDTO>> GetPerfilAsync();
-        public Task<Response<PerfilDTO>> UpdatePerfilAsync(PerfilDTO dto);
+        public Task<Response<ProfileDTO>> GetProfileAsync();
+        public Task<Response<ProfileDTO>> UpdateProfileAsync(ProfileDTO dto);
 
-        // urlRestablecer: URL de la página de restablecimiento; se le agregan email y token
-        public Task<Response<object>> ForgotPasswordAsync(ForgotPasswordDTO dto, string urlRestablecer);
+        // resetUrl: URL of the reset page; email and token are appended to it
+        public Task<Response<object>> ForgotPasswordAsync(ForgotPasswordDTO dto, string resetUrl);
         public Task<Response<object>> ResetPasswordAsync(ResetPasswordDTO dto);
     }
 }
