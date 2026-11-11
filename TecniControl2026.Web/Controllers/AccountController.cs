@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TecniControl2026.Web.Core;
 using TecniControl2026.Web.DTOs.Account;
 using TecniControl2026.Web.Services.Abstractions;
+using MySignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace TecniControl2026.Web.Controllers
 {
@@ -28,15 +29,15 @@ namespace TecniControl2026.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                Response<object> response = await _accountService.LoginAsync(dto);
+                Response<MySignInResult> result = await _accountService.LoginAsync(dto);
 
-                if (response.IsSuccess)
+                if (result.IsSuccess)
                 {
                     return RedirectToAction("Index", "Home");
                 }
 
-                ModelState.AddModelError(string.Empty, response.Message!);
-                _notyfService.Error(response.Message!);
+                ModelState.AddModelError(string.Empty, "Email o contraseña incorrectos");
+                _notyfService.Error("Email o contraseña incorrectos");
             }
             else
             {

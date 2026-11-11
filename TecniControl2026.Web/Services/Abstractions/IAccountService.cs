@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using TecniControl2026.Web.Core;
 using TecniControl2026.Web.DTOs.Account;
 
@@ -5,7 +6,7 @@ namespace TecniControl2026.Web.Services.Abstractions
 {
     public interface IAccountService
     {
-        public Task<Response<object>> LoginAsync(LoginDTO dto);
+        public Task<Response<SignInResult>> LoginAsync(LoginDTO dto);
         public Task LogoutAsync();
         public Task<Response<object>> ChangePasswordAsync(ChangePasswordDTO dto);
         public Task<Response<ProfileDTO>> GetProfileAsync();
