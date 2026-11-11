@@ -1,0 +1,105 @@
+@model UpdateUserDTO
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+    bool isCurrentUser = ViewBag.IsCurrentUser as bool? ?? false;
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Usuarios</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Datos del usuario</h5>
+
+            <form asp-action="Edit" method="post" class="row g-3">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Document" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Document)" />
+                        <label asp-for="Document"></label>
+                        <span asp-validation-for="Document" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    @if (isCurrentUser)
+                    {
+                        @* You cannot change your own role; the disabled select is not submitted, so it is sent hidden *@
+                        <input type="hidden" asp-for="RoleId" />
+                        <div class="form-floating">
+                            <select asp-items="@(ViewBag.Roles as List<SelectListItem>)" class="form-select" disabled></select>
+                            <label asp-for="RoleId"></label>
+                        </div>
+                        <div class="form-text">No puede cambiar su propio rol.</div>
+                    }
+                    else
+                    {
+                        <div class="form-floating">
+                            <select asp-for="RoleId" asp-items="@(ViewBag.Roles as List<SelectListItem>)" class="form-select"></select>
+                            <label asp-for="RoleId"></label>
+                            <span asp-validation-for="RoleId" class="text-danger"></span>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="FirstName" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.FirstName)" />
+                        <label asp-for="FirstName"></label>
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="LastName" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.LastName)" />
+                        <label asp-for="LastName"></label>
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Email" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.Email)" />
+                        <label asp-for="Email"></label>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="PhoneNumber" class="form-control" placeholder="@Html.DisplayNameFor(dto => dto.PhoneNumber)" />
+                        <label asp-for="PhoneNumber"></label>
+                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-12 text-center mt-3">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-save"></i> Guardar
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
