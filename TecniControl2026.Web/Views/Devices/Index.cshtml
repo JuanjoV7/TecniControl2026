@@ -4,9 +4,9 @@
 
 @{
     ViewData["Title"] = "Equipos";
-    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Devices.Create)).Succeeded;
-    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Devices.Update)).Succeeded;
-    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Devices.Delete)).Succeeded;
+    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Create)).Succeeded;
+    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Update)).Succeeded;
+    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Delete)).Succeeded;
 }
 
 <div class="pagetitle">

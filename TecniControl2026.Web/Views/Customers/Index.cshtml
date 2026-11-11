@@ -4,8 +4,8 @@
 
 @{
     ViewData["Title"] = "Clientes";
-    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Customers.Create)).Succeeded;
-    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Customers.Update)).Succeeded;
+    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Customers.Create)).Succeeded;
+    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Customers.Update)).Succeeded;
 }
 
 <div class="pagetitle">

@@ -1,9 +1,9 @@
 @using Microsoft.AspNetCore.Authorization
 @inject IAuthorizationService AuthorizationService
 @{
-    bool canShowCustomers = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Customers.Show)).Succeeded;
-    bool canShowDevices = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Devices.Show)).Succeeded;
-    bool canShowRoles = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Roles.Show)).Succeeded;
+    bool canShowCustomers = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Customers.Show)).Succeeded;
+    bool canShowDevices = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Show)).Succeeded;
+    bool canShowRoles = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Show)).Succeeded;
 }
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">

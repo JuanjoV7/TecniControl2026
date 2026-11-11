@@ -3,9 +3,9 @@
 @model PaginationResponse<RoleDTO>
 @{
     ViewData["Title"] = "Roles y permisos";
-    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Roles.Create)).Succeeded;
-    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Roles.Update)).Succeeded;
-    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, PermissionsCatalog.Roles.Delete)).Succeeded;
+    bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Create)).Succeeded;
+    bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Update)).Succeeded;
+    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Delete)).Succeeded;
 }
 <div class="pagetitle"><h1>@ViewData["Title"]</h1><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li><li class="breadcrumb-item active">Roles</li></ol></nav></div>
 <section class="section"><div class="card"><div class="card-body">
