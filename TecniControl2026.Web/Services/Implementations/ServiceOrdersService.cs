@@ -46,6 +46,11 @@ namespace TecniControl2026.Web.Services.Implementations
                     return Response<ServiceOrderDTO>.Failure("El equipo seleccionado no existe");
                 }
 
+                if (!device.IsActive)
+                {
+                    return Response<ServiceOrderDTO>.Failure("El equipo seleccionado está inactivo");
+                }
+
                 if (!device.Customer.IsActive)
                 {
                     return Response<ServiceOrderDTO>.Failure("El cliente del equipo está inactivo");
@@ -95,7 +100,7 @@ namespace TecniControl2026.Web.Services.Implementations
                     observation += $" Técnico asignado: {technician.FullName}.";
                 }
 
-                order.FollowUps.Add(NewFollowUp(userId.Value, now, observation, null, OrderStatus.Received));
+                AddFollowUp(order, userId.Value, now, observation, null, OrderStatus.Received);
 
                 await _context.ServiceOrders.AddAsync(order);
                 await _context.SaveChangesAsync();
@@ -233,7 +238,7 @@ namespace TecniControl2026.Web.Services.Implementations
                     : $"Técnico cambiado de {order.Technician.FullName} a {technician.FullName}.";
 
                 order.TechnicianId = technician.Id;
-                order.FollowUps.Add(NewFollowUp(_currentUser.UserId!.Value, DateTime.Now, observation, null, null));
+                AddFollowUp(order, _currentUser.UserId!.Value, DateTime.Now, observation, null, null);
 
                 await _context.SaveChangesAsync();
 
@@ -307,11 +312,12 @@ namespace TecniControl2026.Web.Services.Implementations
                     ? (changesStatus ? $"Estado actualizado a {OrderStatusRules.Name(dto.Status)}." : "Atención técnica actualizada.")
                     : dto.Observation.Trim();
 
-                order.FollowUps.Add(NewFollowUp(_currentUser.UserId!.Value,
-                                                        DateTime.Now,
-                                                        observation,
-                                                        changesStatus ? previousStatus : null,
-                                                        changesStatus ? dto.Status : null));
+                AddFollowUp(order,
+                            _currentUser.UserId!.Value,
+                            DateTime.Now,
+                            observation,
+                            changesStatus ? previousStatus : null,
+                            changesStatus ? dto.Status : null);
 
                 await _context.SaveChangesAsync();
 
@@ -348,8 +354,8 @@ namespace TecniControl2026.Web.Services.Implementations
                     ? "Equipo entregado al cliente."
                     : dto.Observation.Trim();
 
-                order.FollowUps.Add(NewFollowUp(_currentUser.UserId!.Value, now, observation,
-                                                        OrderStatus.ReadyForDelivery, OrderStatus.Delivered));
+                AddFollowUp(order, _currentUser.UserId!.Value, now, observation,
+                            OrderStatus.ReadyForDelivery, OrderStatus.Delivered);
 
                 await _context.SaveChangesAsync();
 
@@ -385,8 +391,8 @@ namespace TecniControl2026.Web.Services.Implementations
                 order.CancellationDate = now;
                 order.CancellationReason = reason;
 
-                order.FollowUps.Add(NewFollowUp(_currentUser.UserId!.Value, now, $"Orden cancelada. Motivo: {reason}",
-                                                        previousStatus, OrderStatus.Cancelled));
+                AddFollowUp(order, _currentUser.UserId!.Value, now, $"Orden cancelada. Motivo: {reason}",
+                            previousStatus, OrderStatus.Cancelled);
 
                 await _context.SaveChangesAsync();
 
@@ -455,17 +461,19 @@ namespace TecniControl2026.Web.Services.Implementations
             return Response<User>.Success(technician);
         }
 
-        private static FollowUp NewFollowUp(Guid userId, DateTime date, string observation, OrderStatus? previous, OrderStatus? newStatus)
+        private void AddFollowUp(ServiceOrder order, Guid userId, DateTime date, string observation,
+                                 OrderStatus? previous, OrderStatus? newStatus)
         {
-            return new FollowUp
+            _context.FollowUps.Add(new FollowUp
             {
                 Id = Guid.NewGuid(),
+                ServiceOrderId = order.Id,
                 UserId = userId,
                 Date = date,
                 Observation = observation,
                 PreviousStatus = previous,
                 NewStatus = newStatus,
-            };
+            });
         }
     }
 }

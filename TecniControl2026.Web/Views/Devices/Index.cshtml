@@ -7,7 +7,7 @@
     bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Create)).Succeeded;
     bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Update)).Succeeded;
     bool canCreateOrder = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Orders.Create)).Succeeded;
-    bool canDelete = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Delete)).Succeeded;
+    bool canToggle = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Delete)).Succeeded;
 }
 
 <div class="pagetitle">
@@ -44,12 +44,12 @@
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead>
-                        <tr><th>Cliente</th><th>Documento</th><th>Tipo</th><th>Marca</th><th>Modelo</th><th>Serial</th><th class="text-end">Acciones</th></tr>
+                        <tr><th>Cliente</th><th>Documento</th><th>Tipo</th><th>Marca</th><th>Modelo</th><th>Serial</th><th>Estado</th><th class="text-end">Acciones</th></tr>
                     </thead>
                     <tbody>
                         @if (!Model.List.Any())
                         {
-                            <tr><td colspan="7" class="text-center text-muted">No se encontraron equipos.</td></tr>
+                            <tr><td colspan="8" class="text-center text-muted">No se encontraron equipos.</td></tr>
                         }
                         @foreach (DeviceDTO item in Model.List)
                         {
@@ -60,16 +60,20 @@
                                 <td>@item.Brand</td>
                                 <td>@item.DeviceModel</td>
                                 <td>@(string.IsNullOrWhiteSpace(item.SerialNumber) ? "Sin serial" : item.SerialNumber)</td>
+                                <td><span class="badge @(item.IsActive ? "bg-success" : "bg-secondary")">@(item.IsActive ? "Activo" : "Inactivo")</span></td>
                                 <td class="text-end">
-                                    @if (canCreateOrder) { <a class="btn btn-sm btn-primary" asp-controller="Orders" asp-action="Create" asp-route-deviceId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Nueva orden de servicio"><i class="bi bi-clipboard-plus"></i></a> }
+                                    @if (canCreateOrder && item.IsActive) { <a class="btn btn-sm btn-primary" asp-controller="Orders" asp-action="Create" asp-route-deviceId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Nueva orden de servicio"><i class="bi bi-clipboard-plus"></i></a> }
                                     @if (canUpdate) { <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar"><i class="bi bi-pencil-fill"></i></a> }
-                                    @if (canDelete)
+                                    @if (canToggle)
                                     {
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline">
-                                        <button type="submit" class="btn btn-sm btn-danger btnDelete"
+                                    <form asp-action="Toggle" method="post" class="d-inline">
+                                        <input type="hidden" name="DeviceId" value="@item.Id" />
+                                        <input type="hidden" name="IsActive" value="@((!item.IsActive).ToString().ToLowerInvariant())" />
+                                        <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-danger" : "btn-success") btnToggle"
                                                 data-device="@item.Description"
-                                                data-bs-toggle="tooltip" data-bs-title="Eliminar">
-                                            <i class="bi bi-trash-fill"></i>
+                                                data-active="@item.IsActive.ToString().ToLowerInvariant()"
+                                                data-bs-toggle="tooltip" data-bs-title="@(item.IsActive ? "Desactivar" : "Activar")">
+                                            <i class="bi @(item.IsActive ? "bi-toggle-off" : "bi-toggle-on")"></i>
                                         </button>
                                     </form>
                                     }
@@ -101,18 +105,20 @@
         document.querySelectorAll('[data-bs-toggle="tooltip"]')
             .forEach(element => new bootstrap.Tooltip(element));
 
-        $(document).on('click', '.btnDelete', function (event) {
+        $(document).on('click', '.btnToggle', function (event) {
             event.preventDefault();
 
             const form = $(this).closest('form');
             const device = $(this).data('device');
+            const isActive = $(this).data('active') === true;
+            const action = isActive ? 'desactivar' : 'activar';
 
             Swal.fire({
                 icon: 'question',
-                title: '¿Desea eliminar el equipo?',
+                title: `¿Desea ${action} el equipo?`,
                 text: device,
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: `Sí, ${action}`,
                 cancelButtonText: 'Cancelar'
             }).then(result => {
                 if (result.isConfirmed) {

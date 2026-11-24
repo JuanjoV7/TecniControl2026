@@ -20,6 +20,8 @@ namespace TecniControl2026.Web.Data.Entities
         [MaxLength(100)]
         public string? SerialNumber { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; } = null!;
 

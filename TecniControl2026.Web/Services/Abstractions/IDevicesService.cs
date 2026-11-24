@@ -7,7 +7,7 @@ namespace TecniControl2026.Web.Services.Abstractions
     public interface IDevicesService
     {
         public Task<Response<CreateDeviceDTO>> CreateAsync(CreateDeviceDTO dto);
-        public Task<Response<object>> DeleteAsync(Guid id);
+        public Task<Response<object>> ToggleAsync(ToggleDeviceStatusDTO dto);
         public Task<Response<DeviceDTO>> GetOneAsync(Guid id);
         public Task<Response<PaginationResponse<DeviceDTO>>> GetPaginationAsync(PaginationRequest request);
         public Task<Response<List<DeviceDTO>>> GetByCustomerAsync(Guid customerId);

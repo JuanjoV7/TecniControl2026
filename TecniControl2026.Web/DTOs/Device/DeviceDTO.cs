@@ -14,6 +14,8 @@ namespace TecniControl2026.Web.DTOs.Device
         public string DeviceModel { get; set; } = null!;
         public string? SerialNumber { get; set; }
 
+        public bool IsActive { get; set; }
+
         public Guid CustomerId { get; set; }
 
         [Display(Name = "Cliente")]
