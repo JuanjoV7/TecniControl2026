@@ -1,0 +1,242 @@
+@model OrderDetailsViewModel
+
+@{
+    ServiceOrderDetailDTO order = Model.Order;
+    ViewData["Title"] = $"Orden N° {order.Number}";
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Órdenes de servicio</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+
+    @* Header: status and the actions the user can do (permission + order state) *@
+    <div class="card">
+        <div class="card-body pt-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="card-title p-0 m-0">Estado de la orden</h5>
+                    <span class="fs-6"><partial name="_OrderStatusBadge" model="order.Status" /></span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.CanAssignTechnician)
+                    {
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#assignModal">
+                            <i class="bi bi-person-gear"></i> @(order.TechnicianId is null ? "Asignar técnico" : "Cambiar técnico")
+                        </button>
+                    }
+
+                    @if (Model.CanAttend)
+                    {
+                        <a asp-action="Attend" asp-route-id="@order.Id" class="btn btn-warning btn-sm">
+                            <i class="bi bi-tools"></i> Registrar atención
+                        </a>
+                    }
+
+                    @if (Model.CanDeliver)
+                    {
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#deliverModal">
+                            <i class="bi bi-box-seam"></i> Entregar
+                        </button>
+                    }
+
+                    @if (Model.CanCancel)
+                    {
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                            <i class="bi bi-x-circle"></i> Cancelar orden
+                        </button>
+                    }
+
+                    <a asp-action="Index" class="btn btn-secondary btn-sm">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                </div>
+            </div>
+
+            @if (!Model.HasActions && !OrderStatusRules.IsFinal(order.Status))
+            {
+                <p class="text-muted small mt-3 mb-0">No tiene acciones disponibles sobre esta orden.</p>
+            }
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Cliente y equipo</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Cliente</dt>
+                        <dd class="col-sm-8">@order.CustomerName</dd>
+
+                        <dt class="col-sm-4">Teléfono</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(order.CustomerPhone) ? "Sin registrar" : order.CustomerPhone)</dd>
+
+                        <dt class="col-sm-4">Equipo</dt>
+                        <dd class="col-sm-8">@order.DeviceDescription</dd>
+
+                        <dt class="col-sm-4">Falla reportada</dt>
+                        <dd class="col-sm-8 text-break" style="white-space: pre-line">@order.ReportedIssue</dd>
+
+                        <dt class="col-sm-4">Accesorios</dt>
+                        <dd class="col-sm-8 text-break">@(string.IsNullOrWhiteSpace(order.Accessories) ? "Ninguno" : order.Accessories)</dd>
+
+                        <dt class="col-sm-4">Recepción</dt>
+                        <dd class="col-sm-8">@order.ReceptionDate.ToString("dd/MM/yyyy HH:mm") · @order.ReceivedByName</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Atención técnica</h5>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Técnico</dt>
+                        <dd class="col-sm-8">
+                            @if (order.TechnicianName is null)
+                            {
+                                <span class="badge bg-light text-dark border">Sin asignar</span>
+                            }
+                            else
+                            {
+                                @order.TechnicianName
+                            }
+                        </dd>
+
+                        <dt class="col-sm-4">Diagnóstico</dt>
+                        <dd class="col-sm-8 text-break" style="white-space: pre-line">@(string.IsNullOrWhiteSpace(order.Diagnosis) ? "Sin registrar" : order.Diagnosis)</dd>
+
+                        <dt class="col-sm-4">Trabajo realizado</dt>
+                        <dd class="col-sm-8 text-break" style="white-space: pre-line">@(string.IsNullOrWhiteSpace(order.WorkPerformed) ? "Sin registrar" : order.WorkPerformed)</dd>
+
+                        @if (order.DeliveryDate is not null)
+                        {
+                            <dt class="col-sm-4">Entrega</dt>
+                            <dd class="col-sm-8">@order.DeliveryDate.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+                        }
+
+                        @if (order.CancellationDate is not null)
+                        {
+                            <dt class="col-sm-4">Cancelación</dt>
+                            <dd class="col-sm-8">@order.CancellationDate.Value.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                            <dt class="col-sm-4">Motivo</dt>
+                            <dd class="col-sm-8 text-break">@order.CancellationReason</dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Seguimiento</h5>
+
+            @if (Model.CanAddFollowUp)
+            {
+                <form asp-action="AddFollowUp" method="post" class="row g-2 mb-4">
+                    <input type="hidden" name="ServiceOrderId" value="@order.Id" />
+                    <div class="col">
+                        <input name="Observation" class="form-control" maxlength="1000" required
+                               placeholder="Agregar una observación al seguimiento..." aria-label="Observación" />
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-chat-left-text"></i> Agregar
+                        </button>
+                    </div>
+                </form>
+            }
+
+            @if (!order.FollowUps.Any())
+            {
+                <p class="text-muted mb-0">Esta orden aún no tiene seguimientos.</p>
+            }
+            else
+            {
+                <div class="activity">
+                    @foreach (FollowUpDTO followUp in order.FollowUps)
+                    {
+                        string color = followUp.NewStatus switch
+                        {
+                            OrderStatus.Delivered => "text-success",
+                            OrderStatus.Cancelled => "text-danger",
+                            OrderStatus.ReadyForDelivery => "text-primary",
+                            OrderStatus.InRepair => "text-warning",
+                            OrderStatus.InDiagnosis => "text-info",
+                            _ => "text-muted"
+                        };
+
+                        <div class="activity-item d-flex">
+                            <div class="activite-label" style="min-width: 110px">
+                                @followUp.Date.ToString("dd/MM/yyyy")<br />
+                                <small>@followUp.Date.ToString("HH:mm")</small>
+                            </div>
+                            <i class="bi bi-circle-fill activity-badge @color align-self-start"></i>
+                            <div class="activity-content">
+                                <strong>@followUp.UserFullName</strong><br />
+                                <span class="text-break" style="white-space: pre-line">@followUp.Observation</span>
+
+                                @if (followUp.NewStatus is not null)
+                                {
+                                    <div class="mt-1">
+                                        @if (followUp.PreviousStatus is not null)
+                                        {
+                                            <partial name="_OrderStatusBadge" model="followUp.PreviousStatus.Value" />
+                                            <i class="bi bi-arrow-right mx-1"></i>
+                                        }
+                                        <partial name="_OrderStatusBadge" model="followUp.NewStatus.Value" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+</section>
+
+@if (Model.CanAssignTechnician)
+{
+    <partial name="_AssignTechnicianModal" model="Model" />
+}
+
+@if (Model.CanDeliver)
+{
+    <partial name="_DeliverModal" model="Model" />
+}
+
+@if (Model.CanCancel)
+{
+    <partial name="_CancelModal" model="Model" />
+}
+
+@section Scripts {
+    <script>
+        // Puts the cursor in the first field when a modal opens
+        document.querySelectorAll('.modal').forEach(function (modal) {
+            modal.addEventListener('shown.bs.modal', function () {
+                const field = modal.querySelector('select, textarea, input:not([type=hidden])');
+                if (field) field.focus();
+            });
+        });
+    </script>
+}
