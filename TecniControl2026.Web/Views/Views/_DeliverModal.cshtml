@@ -1,0 +1,34 @@
+@model OrderDetailsViewModel
+
+<div class="modal fade" id="deliverModal" tabindex="-1" aria-labelledby="deliverModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form asp-action="Deliver" method="post" class="modal-content">
+            <input type="hidden" name="ServiceOrderId" value="@Model.Order.Id" />
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="deliverModalLabel">Entregar equipo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    Se registrará la entrega de <strong>@Model.Order.DeviceDescription</strong>
+                    a <strong>@Model.Order.CustomerName</strong>. La orden quedará cerrada.
+                </p>
+
+                <div class="form-floating">
+                    <textarea name="Observation" class="form-control" style="height: 100px" maxlength="1000"
+                              placeholder="Observación"></textarea>
+                    <label>Observación (opcional)</label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-box-seam"></i> Confirmar entrega
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
