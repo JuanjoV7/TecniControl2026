@@ -1,0 +1,138 @@
+@model CreateServiceOrderDTO
+
+@{
+    ViewData["Title"] = "Nueva Orden de Servicio";
+    bool canAssignTechnician = ViewBag.CanAssignTechnician as bool? ?? false;
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Órdenes de servicio</a></li>
+            <li class="breadcrumb-item active">@ViewData["Title"]</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Recepción del equipo</h5>
+
+            <form asp-action="Create" method="post" class="row g-3">
+
+                <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+
+                <div class="col-md-6">
+                    @* Helper field: it only filters the devices, the order is saved with the device *@
+                    <div class="form-floating">
+                        <select id="customerSelect" asp-items="@(ViewBag.Customers as List<SelectListItem>)" class="form-select">
+                            <option value="">Seleccione un cliente</option>
+                        </select>
+                        <label for="customerSelect">Cliente</label>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select asp-for="DeviceId" asp-items="@(ViewBag.Devices as List<SelectListItem>)" class="form-select">
+                            <option value="">Seleccione un equipo</option>
+                        </select>
+                        <label asp-for="DeviceId"></label>
+                        <span asp-validation-for="DeviceId" class="text-danger"></span>
+                    </div>
+                    <div id="noDevices" class="form-text text-danger d-none">
+                        Este cliente no tiene equipos registrados. Regístrelo primero en el módulo de Equipos.
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-floating">
+                        <textarea asp-for="ReportedIssue" class="form-control" style="height: 110px"
+                                  placeholder="@Html.DisplayNameFor(dto => dto.ReportedIssue)" maxlength="500"></textarea>
+                        <label asp-for="ReportedIssue"></label>
+                        <span asp-validation-for="ReportedIssue" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input asp-for="Accessories" class="form-control" maxlength="500"
+                               placeholder="@Html.DisplayNameFor(dto => dto.Accessories)" />
+                        <label asp-for="Accessories"></label>
+                        <span asp-validation-for="Accessories" class="text-danger"></span>
+                    </div>
+                    <div class="form-text">Por ejemplo: cargador, mouse, funda.</div>
+                </div>
+
+                @if (canAssignTechnician)
+                {
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select asp-for="TechnicianId" asp-items="@(ViewBag.Technicians as List<SelectListItem>)" class="form-select">
+                                <option value="">Asignar más tarde</option>
+                            </select>
+                            <label asp-for="TechnicianId"></label>
+                            <span asp-validation-for="TechnicianId" class="text-danger"></span>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-12 text-center mt-3">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-save"></i> Registrar orden
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        (function () {
+            const customerSelect = document.getElementById('customerSelect');
+            const deviceSelect = document.getElementById('DeviceId');
+            const noDevices = document.getElementById('noDevices');
+            const url = '@Url.Action("DevicesByCustomer", "Orders")';
+
+            customerSelect.addEventListener('change', async function () {
+                deviceSelect.innerHTML = '<option value="">Seleccione un equipo</option>';
+                noDevices.classList.add('d-none');
+
+                if (!customerSelect.value) return;
+
+                deviceSelect.disabled = true;
+
+                try {
+                    const response = await fetch(url + '?customerId=' + encodeURIComponent(customerSelect.value),
+                                                 { headers: { 'Accept': 'application/json' } });
+
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                    const devices = await response.json();
+
+                    devices.forEach(function (device) {
+                        const option = document.createElement('option');
+                        option.value = device.id;
+                        option.textContent = device.text;
+                        deviceSelect.appendChild(option);
+                    });
+
+                    noDevices.classList.toggle('d-none', devices.length > 0);
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({ icon: 'error', title: 'No se pudieron cargar los equipos del cliente' });
+                } finally {
+                    deviceSelect.disabled = false;
+                }
+            });
+        })();
+    </script>
+}
