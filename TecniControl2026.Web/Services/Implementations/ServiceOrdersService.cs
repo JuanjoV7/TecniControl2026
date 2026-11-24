@@ -475,5 +475,47 @@ namespace TecniControl2026.Web.Services.Implementations
                 NewStatus = newStatus,
             });
         }
+
+        public async Task<Response<object>> UpdateReceptionAsync(UpdateReceptionDTO dto)
+        {
+            try
+            {
+                ServiceOrder? order = await _context.ServiceOrders.FirstOrDefaultAsync(o => o.Id == dto.Id);
+
+                if (order is null)
+                {
+                    return Response<object>.Failure($"No existe orden con id {dto.Id}");
+                }
+
+                if (OrderStatusRules.IsFinal(order.Status))
+                {
+                    return Response<object>.Failure("No se puede corregir la recepción de una orden entregada o cancelada");
+                }
+
+                if (!string.IsNullOrWhiteSpace(order.Diagnosis))
+                {
+                    return Response<object>.Failure("No se puede corregir la recepción después de iniciar el diagnóstico");
+                }
+
+                order.ReportedIssue = dto.ReportedIssue.Trim();
+                order.Accessories = string.IsNullOrWhiteSpace(dto.Accessories) ? null : dto.Accessories.Trim();
+
+                AddFollowUp(
+                    order,
+                    _currentUser.UserId!.Value,
+                    DateTime.Now,
+                    "Datos de recepción corregidos antes del diagnóstico.",
+                    null,
+                    null);
+
+                await _context.SaveChangesAsync();
+
+                return Response<object>.Success("Recepción actualizada con éxito");
+            }
+            catch (Exception ex)
+            {
+                return Response<object>.Failure(ex);
+            }
+        }
     }
 }

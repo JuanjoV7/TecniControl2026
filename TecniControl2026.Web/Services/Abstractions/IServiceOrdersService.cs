@@ -14,5 +14,6 @@ namespace TecniControl2026.Web.Services.Abstractions
         public Task<Response<object>> RegisterAttentionAsync(RegisterAttentionDTO dto);
         public Task<Response<object>> DeliverAsync(DeliverOrderDTO dto);
         public Task<Response<object>> CancelAsync(CancelOrderDTO dto);
+        public Task<Response<object>> UpdateReceptionAsync(UpdateReceptionDTO dto);
     }
 }
