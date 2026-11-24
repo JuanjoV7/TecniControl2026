@@ -1,0 +1,115 @@
+@model RegisterAttentionDTO
+
+@{
+    ServiceOrderDetailDTO order = (ServiceOrderDetailDTO)ViewBag.Order;
+    ViewData["Title"] = $"Registrar atención - Orden N° {order.Number}";
+}
+
+<div class="pagetitle">
+    <h1>@ViewData["Title"]</h1>
+    <nav>
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Inicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Órdenes de servicio</a></li>
+            <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@order.Id">Orden N° @order.Number</a></li>
+            <li class="breadcrumb-item active">Atención</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="section">
+    <div class="row">
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Resumen de la orden</h5>
+
+                    <dl class="mb-0">
+                        <dt>Estado actual</dt>
+                        <dd><partial name="_OrderStatusBadge" model="order.Status" /></dd>
+
+                        <dt>Cliente</dt>
+                        <dd>@order.CustomerName</dd>
+
+                        <dt>Equipo</dt>
+                        <dd>@order.DeviceDescription</dd>
+
+                        <dt>Falla reportada</dt>
+                        <dd class="text-break" style="white-space: pre-line">@order.ReportedIssue</dd>
+
+                        <dt>Técnico</dt>
+                        <dd class="mb-0">@order.TechnicianName</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Atención técnica</h5>
+
+                    <form asp-action="Attend" method="post" class="row g-3">
+
+                        <input type="hidden" asp-for="ServiceOrderId" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger col-12"></div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select asp-for="Status" asp-items="@(ViewBag.Statuses as List<SelectListItem>)" class="form-select"></select>
+                                <label asp-for="Status"></label>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea asp-for="Diagnosis" class="form-control" style="height: 120px" maxlength="2000"
+                                          placeholder="@Html.DisplayNameFor(dto => dto.Diagnosis)"></textarea>
+                                <label asp-for="Diagnosis"></label>
+                                <span asp-validation-for="Diagnosis" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea asp-for="WorkPerformed" class="form-control" style="height: 120px" maxlength="2000"
+                                          placeholder="@Html.DisplayNameFor(dto => dto.WorkPerformed)"></textarea>
+                                <label asp-for="WorkPerformed"></label>
+                                <span asp-validation-for="WorkPerformed" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-floating">
+                                <textarea asp-for="Observation" class="form-control" style="height: 90px" maxlength="1000"
+                                          placeholder="@Html.DisplayNameFor(dto => dto.Observation)"></textarea>
+                                <label asp-for="Observation"></label>
+                                <span asp-validation-for="Observation" class="text-danger"></span>
+                            </div>
+                            <div class="form-text">
+                                Para pasar a <strong>En reparación</strong> o <strong>Lista para entrega</strong> debe registrar el diagnóstico.
+                                Para <strong>Lista para entrega</strong> también el trabajo realizado.
+                            </div>
+                        </div>
+
+                        <div class="col-12 text-center mt-3">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-save"></i> Guardar atención
+                            </button>
+                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-secondary">Cancelar</a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
