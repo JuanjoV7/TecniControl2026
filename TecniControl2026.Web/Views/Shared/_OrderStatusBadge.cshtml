@@ -1,0 +1,16 @@
+@model OrderStatus
+
+@{
+    string css = Model switch
+    {
+        OrderStatus.Received => "bg-secondary",
+        OrderStatus.InDiagnosis => "bg-info text-dark",
+        OrderStatus.InRepair => "bg-warning text-dark",
+        OrderStatus.ReadyForDelivery => "bg-primary",
+        OrderStatus.Delivered => "bg-success",
+        OrderStatus.Cancelled => "bg-danger",
+        _ => "bg-secondary"
+    };
+}
+
+<span class="badge @css">@OrderStatusRules.Name(Model)</span>
