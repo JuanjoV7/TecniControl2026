@@ -4,6 +4,7 @@ using TecniControl2026.Web.Core;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.Data;
 using TecniControl2026.Web.Data.Entities;
+using TecniControl2026.Web.Data.Enums;
 using TecniControl2026.Web.DTOs.Customer;
 using TecniControl2026.Web.Services.Abstractions;
 
@@ -119,6 +120,18 @@ namespace TecniControl2026.Web.Services.Implementations
                 if (customer is null)
                 {
                     return Response<object>.Failure($"No existe cliente con id: {dto.CustomerId}");
+                }
+
+                if (!dto.IsActive)
+                {
+                    bool hasOpenOrders = await _context.ServiceOrders.AnyAsync(o => o.Device.CustomerId == customer.Id
+                                                                                   && o.Status != OrderStatus.Delivered
+                                                                                   && o.Status != OrderStatus.Cancelled);
+
+                    if (hasOpenOrders)
+                    {
+                        return Response<object>.Failure("No se puede desactivar el cliente porque tiene órdenes de servicio abiertas");
+                    }
                 }
 
                 customer.IsActive = dto.IsActive;

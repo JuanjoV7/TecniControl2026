@@ -133,9 +133,9 @@ namespace TecniControl2026.Web.Controllers
 
         [HttpPost, ValidateAntiForgeryToken]
         [HasPermission(PermissionsCatalog.Devices.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] Guid id)
+        public async Task<IActionResult> Toggle([FromForm] ToggleDeviceStatusDTO dto)
         {
-            Response<object> response = await _devicesService.DeleteAsync(id);
+            Response<object> response = await _devicesService.ToggleAsync(dto);
 
             if (!response.IsSuccess)
             {

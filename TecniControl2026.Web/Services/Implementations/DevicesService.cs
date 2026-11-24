@@ -4,6 +4,7 @@ using TecniControl2026.Web.Core;
 using TecniControl2026.Web.Core.Pagination;
 using TecniControl2026.Web.Data;
 using TecniControl2026.Web.Data.Entities;
+using TecniControl2026.Web.Data.Enums;
 using TecniControl2026.Web.DTOs.Device;
 using TecniControl2026.Web.Services.Abstractions;
 
@@ -41,28 +42,39 @@ namespace TecniControl2026.Web.Services.Implementations
             return response;
         }
 
-        public async Task<Response<object>> DeleteAsync(Guid id)
+        public async Task<Response<object>> ToggleAsync(ToggleDeviceStatusDTO dto)
         {
-            if (!await _context.Devices.AnyAsync(e => e.Id == id))
+            try
             {
-                return Response<object>.Failure($"No existe equipo con id {id}");
+                Device? device = await _context.Devices.FirstOrDefaultAsync(e => e.Id == dto.DeviceId);
+
+                if (device is null)
+                {
+                    return Response<object>.Failure($"No existe equipo con id {dto.DeviceId}");
+                }
+
+                if (!dto.IsActive)
+                {
+                    bool hasOpenOrders = await _context.ServiceOrders.AnyAsync(o => o.DeviceId == device.Id
+                                                                                   && o.Status != OrderStatus.Delivered
+                                                                                   && o.Status != OrderStatus.Cancelled);
+
+                    if (hasOpenOrders)
+                    {
+                        return Response<object>.Failure("No se puede desactivar el equipo porque tiene órdenes de servicio abiertas");
+                    }
+                }
+
+                device.IsActive = dto.IsActive;
+                _context.Devices.Update(device);
+                await _context.SaveChangesAsync();
+
+                return Response<object>.Success(dto.IsActive ? "Equipo activado con éxito" : "Equipo desactivado con éxito");
             }
-
-            bool hasOrders = await _context.ServiceOrders.AnyAsync(o => o.DeviceId == id);
-
-            if (hasOrders)
+            catch (Exception ex)
             {
-                return Response<object>.Failure("No se puede eliminar el equipo porque tiene órdenes de servicio asociadas");
+                return Response<object>.Failure(ex);
             }
-
-            Response<object> response = await DeleteAsync<Device>(id);
-
-            if (response.IsSuccess)
-            {
-                response.Message = "Equipo eliminado con éxito";
-            }
-
-            return response;
         }
 
         public async Task<Response<DeviceDTO>> GetOneAsync(Guid id)
@@ -97,7 +109,7 @@ namespace TecniControl2026.Web.Services.Implementations
             try
             {
                 List<Device> devices = await _context.Devices.Include(e => e.Customer)
-                                                             .Where(e => e.CustomerId == customerId)
+                                                             .Where(e => e.CustomerId == customerId && e.IsActive)
                                                              .OrderBy(e => e.Brand)
                                                              .ThenBy(e => e.DeviceModel)
                                                              .ToListAsync();

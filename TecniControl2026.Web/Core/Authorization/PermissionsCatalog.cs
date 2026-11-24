@@ -61,7 +61,7 @@ namespace TecniControl2026.Web.Core.Authorization
             new(Devices.Show, "Equipos", "Consultar equipos"),
             new(Devices.Create, "Equipos", "Registrar equipos"),
             new(Devices.Update, "Equipos", "Actualizar equipos"),
-            new(Devices.Delete, "Equipos", "Eliminar equipos sin órdenes de servicio asociadas"),
+            new(Devices.Delete, "Equipos", "Activar o desactivar equipos sin órdenes de servicio abiertas"),
 
             new(Orders.ShowAll, "Órdenes de servicio", "Consultar todas las órdenes"),
             new(Orders.ShowAssigned, "Órdenes de servicio", "Consultar las órdenes asignadas al usuario"),
