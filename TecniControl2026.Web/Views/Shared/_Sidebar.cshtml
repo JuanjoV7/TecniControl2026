@@ -3,6 +3,8 @@
 @{
     bool canShowCustomers = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Customers.Show)).Succeeded;
     bool canShowDevices = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Show)).Succeeded;
+    bool canShowOrders = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Orders.ShowAll)).Succeeded
+                      || (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Orders.ShowAssigned)).Succeeded;
     bool canShowUsers = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Users.Show)).Succeeded;
     bool canShowRoles = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Roles.Show)).Succeeded;
 }
@@ -35,6 +37,16 @@
             </li>
         }
 
+        @if (canShowOrders)
+        {
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-controller="Orders" asp-action="Index">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>Órdenes de servicio</span>
+                </a>
+            </li>
+        }
+
         @if (canShowUsers)
         {
             <li class="nav-item">
@@ -63,4 +75,5 @@
         </li>
     </ul>
 </aside>
+
 
