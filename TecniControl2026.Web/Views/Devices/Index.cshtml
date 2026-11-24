@@ -6,6 +6,7 @@
     ViewData["Title"] = "Equipos";
     bool canCreate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Create)).Succeeded;
     bool canUpdate = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Update)).Succeeded;
+    bool canCreateOrder = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Orders.Create)).Succeeded;
     bool canDelete = (await AuthorizationService.AuthorizeAsync(User, HasPermissionAttribute.PolicyPrefix + PermissionsCatalog.Devices.Delete)).Succeeded;
 }
 
@@ -60,6 +61,7 @@
                                 <td>@item.DeviceModel</td>
                                 <td>@(string.IsNullOrWhiteSpace(item.SerialNumber) ? "Sin serial" : item.SerialNumber)</td>
                                 <td class="text-end">
+                                    @if (canCreateOrder) { <a class="btn btn-sm btn-primary" asp-controller="Orders" asp-action="Create" asp-route-deviceId="@item.Id" data-bs-toggle="tooltip" data-bs-title="Nueva orden de servicio"><i class="bi bi-clipboard-plus"></i></a> }
                                     @if (canUpdate) { <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@item.Id" data-bs-toggle="tooltip" data-bs-title="Editar"><i class="bi bi-pencil-fill"></i></a> }
                                     @if (canDelete)
                                     {
